@@ -142,7 +142,7 @@ export default function SelecionarRoupa({ roupaSelecionada, setRoupaSelecionada,
 
       {carregando && roupas.length === 0 ? (
         <div className='empty-state'>
-          <h3>Carregando peças...</h3>
+          <h3>Carregando...</h3>
         </div>
       ) : roupasFiltradas.length === 0 ? (
         <div className='empty-state'>

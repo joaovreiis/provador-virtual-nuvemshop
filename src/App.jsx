@@ -18,6 +18,7 @@ export default function App() {
   const [busto, setBusto] = useState()
   const [cintura, setCintura] = useState()
   const [quadril, setQuadril] = useState()
+  const [naoSabeMedidas, setNaoSabeMedidas] = useState(false)
   const [roupaSelecionada, setRoupaSelecionada] = useState()
   const [formatoCorpo, setFormatoCorpo] = useState('030303')
   
@@ -29,8 +30,13 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
 
-  const handleShowRecommendation = (formato) => {
+  const handleShowRecommendation = (formato, medidasDoMannequin) => {
     if (formato) setFormatoCorpo(formato)
+    if (naoSabeMedidas && medidasDoMannequin) {
+      setBusto(medidasDoMannequin.busto)
+      setCintura(medidasDoMannequin.cintura)
+      setQuadril(medidasDoMannequin.quadril)
+    }
     setMostrarRecomendacao(true)
   }
 
@@ -40,6 +46,7 @@ export default function App() {
 
   const handleSelecionarRoupa = (roupa) => {
     setRoupaSelecionada(roupa)
+    setNaoSabeMedidas(false)
     setStep(1)
   }
 
@@ -59,8 +66,8 @@ export default function App() {
           <>
             {step === 0 && <SelecionarRoupa roupaSelecionada={roupaSelecionada} setRoupaSelecionada={setRoupaSelecionada} onNext={handleSelecionarRoupa} />}
             {step === 1 && <CalculoAlturaPeso onNext={() => setStep(2)} altura={altura} setAltura={setAltura} peso={peso} setPeso={setPeso} idade={idade} setIdade={setIdade} roupaSelecionada={roupaSelecionada} />}
-            {step === 2 && <MedidasCliente onNext={() => setStep(3)} busto={busto} setBusto={setBusto} cintura={cintura} setCintura={setCintura} quadril={quadril} setQuadril={setQuadril} roupaSelecionada={roupaSelecionada} />}
-            {step === 3 && <Mannequin onBack={() => setStep(0)} onShowRecommendation={handleShowRecommendation} altura={altura} peso={peso} busto={busto} cintura={cintura} quadril={quadril} roupaSelecionada={roupaSelecionada} />}
+            {step === 2 && <MedidasCliente onNext={() => setStep(3)} busto={busto} setBusto={setBusto} cintura={cintura} setCintura={setCintura} quadril={quadril} setQuadril={setQuadril} naoSabeMedidas={naoSabeMedidas} setNaoSabeMedidas={setNaoSabeMedidas} roupaSelecionada={roupaSelecionada} />}
+            {step === 3 && <Mannequin onBack={() => setStep(0)} onShowRecommendation={handleShowRecommendation} usarMedidasMannequin={naoSabeMedidas} altura={altura} peso={peso} busto={busto} cintura={cintura} quadril={quadril} roupaSelecionada={roupaSelecionada} />}
           </>
         )}
       </section>
