@@ -1,6 +1,6 @@
 import express from 'express';
 import { initSchema, query } from './db.js';
-import { createAdmin, validateAdmin } from './auth.js';
+import { createAdmin, requireAdmin, validateAdmin } from './auth.js';
 import { mapFormToPiece } from './utils/normalizePiece.js';
 
 const router = express.Router();
@@ -44,6 +44,55 @@ router.post('/admin/create', async (req, res) => {
     }
     const admin = await createAdmin(username, password);
     res.status(201).json(admin);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/categorias', async (_req, res) => {
+  try {
+    await initSchema();
+    const result = await query('SELECT id, nome, medidas FROM categorias ORDER BY id');
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/categorias', requireAdmin, async (req, res) => {
+  try {
+    await initSchema();
+    const nome = req.body?.nome?.trim();
+    const medidas = Array.isArray(req.body?.medidas) ? [...new Set(req.body.medidas)] : [];
+    const medidasValidas = medidas.filter((medida) => ['busto', 'cintura', 'quadril', 'comprimento'].includes(medida));
+
+    if (!nome || medidasValidas.length === 0) {
+      return res.status(400).json({ error: 'Informe o nome e pelo menos uma medida' });
+    }
+
+    const result = await query(
+      'INSERT INTO categorias (nome, medidas) VALUES ($1, $2) RETURNING id, nome, medidas',
+      [nome, JSON.stringify(medidasValidas)]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    if (error.code === '23505') return res.status(409).json({ error: 'Já existe uma categoria com esse nome' });
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete('/categorias/:id', requireAdmin, async (req, res) => {
+  try {
+    await initSchema();
+    const usada = await query(
+      'SELECT 1 FROM roupas WHERE categoria = (SELECT nome FROM categorias WHERE id = $1) LIMIT 1',
+      [req.params.id]
+    );
+    if (usada.rowCount > 0) return res.status(409).json({ error: 'Não é possível excluir uma categoria usada por peças' });
+
+    const result = await query('DELETE FROM categorias WHERE id = $1 RETURNING id', [req.params.id]);
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Categoria não encontrada' });
+    res.json({ ok: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

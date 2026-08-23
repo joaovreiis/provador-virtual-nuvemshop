@@ -43,3 +43,15 @@ export async function validateAdmin(username, password) {
   const token = jwt.sign({ id: admin.id, username: admin.username }, JWT_SECRET, { expiresIn: '8h' });
   return { admin: { id: admin.id, username: admin.username }, token };
 }
+
+export function requireAdmin(req, res, next) {
+  try {
+    const token = req.headers.authorization?.replace(/^Bearer\s+/i, '');
+    if (!token) return res.status(401).json({ error: 'Autenticação necessária' });
+
+    jwt.verify(token, JWT_SECRET);
+    return next();
+  } catch {
+    return res.status(401).json({ error: 'Sessão de administrador inválida' });
+  }
+}

@@ -1,15 +1,25 @@
-function normalizarProduto(produto, index) {
+function normalizarProduto(produto, index, categorias = []) {
+  const categoria = categorias.find(item => item.nome.toLowerCase() === (produto.categoria ?? '').toLowerCase())
   return {
     id: produto.id ?? `admin-${index}`,
     nome: produto.nome ?? produto.name ?? 'Peca sem nome',
     imagem: produto.imagem ?? produto.image ?? '',
     descricao: produto.descricao ?? produto.description ?? '',
     categoria: produto.categoria ?? '',
+    categoriaMedidas: categoria?.medidas,
     tamanhos: produto.tamanhos ?? produto.sizes ?? []
   }
 }
 
-const CATEGORIAS = ['blusa', 'body', 'calça', 'vestido', 'saia', 'short', 'cropped',  ]
+const CATEGORIAS_PADRAO = [
+  { nome: 'Blusa', medidas: ['busto', 'cintura', 'quadril'] },
+  { nome: 'Body', medidas: ['busto', 'cintura'] },
+  { nome: 'Calça', medidas: ['cintura', 'quadril', 'comprimento'] },
+  { nome: 'Vestido', medidas: ['busto', 'cintura', 'quadril', 'comprimento'] },
+  { nome: 'Cropped', medidas: ['busto', 'cintura'] },
+  { nome: 'Short', medidas: ['cintura', 'quadril', 'comprimento'] },
+  { nome: 'Saia', medidas: ['cintura', 'quadril', 'comprimento'] }
+]
 const API_BASE_URL = (import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? `${window.location.origin}/api` : 'http://localhost:3001/api')).replace(/\/$/, '')
 
 function carregarRoupasLocais() {
@@ -18,7 +28,7 @@ function carregarRoupasLocais() {
     const roupasAdmin = raw ? JSON.parse(raw) : []
 
     if (Array.isArray(roupasAdmin) && roupasAdmin.length > 0) {
-      return roupasAmin.map(normalizarProduto)
+      return roupasAdmin.map((produto, index) => normalizarProduto(produto, index, CATEGORIAS_PADRAO))
     }
   } catch {
     // Sem roupas quando o armazenamento local nao puder ser lido.
@@ -31,6 +41,7 @@ import { useEffect, useState } from 'react'
 
 export default function SelecionarRoupa({ roupaSelecionada, setRoupaSelecionada, onNext }) {
   const [roupas, setRoupas] = useState(() => carregarRoupasLocais())
+  const [categorias, setCategorias] = useState(CATEGORIAS_PADRAO)
   const [carregando, setCarregando] = useState(true)
   const roupaAtual = roupaSelecionada ?? roupas[0]
   const [pesquisa, setPesquisa] = useState('')
@@ -43,17 +54,22 @@ export default function SelecionarRoupa({ roupaSelecionada, setRoupaSelecionada,
       setCarregando(true)
 
       try {
-        const response = await fetch(`${API_BASE_URL}/roupas`)
-        if (!response.ok) {
+        const [roupasResponse, categoriasResponse] = await Promise.all([
+          fetch(`${API_BASE_URL}/roupas`),
+          fetch(`${API_BASE_URL}/categorias`)
+        ])
+        if (!roupasResponse.ok) {
           throw new Error('Falha ao carregar roupas')
         }
 
-        const data = await response.json()
+        const data = await roupasResponse.json()
         if (!Array.isArray(data)) {
           throw new Error('Resposta inválida do servidor')
         }
 
-        const roupasApi = data.map(normalizarProduto)
+        const categoriasApi = categoriasResponse.ok ? await categoriasResponse.json() : CATEGORIAS_PADRAO
+        if (Array.isArray(categoriasApi) && categoriasApi.length > 0) setCategorias(categoriasApi)
+        const roupasApi = data.map((produto, index) => normalizarProduto(produto, index, categoriasApi))
 
         if (isMounted) {
           setRoupas(roupasApi)
@@ -131,9 +147,9 @@ export default function SelecionarRoupa({ roupaSelecionada, setRoupaSelecionada,
             onChange={(e) => setCategoriaFiltro(e.target.value)}
           >
             <option value=''>Todas as categorias</option>
-            {CATEGORIAS.map(cat => (
-              <option key={cat} value={cat}>
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+            {categorias.map(cat => (
+              <option key={cat.id ?? cat.nome} value={cat.nome}>
+                {cat.nome}
               </option>
             ))}
           </select>

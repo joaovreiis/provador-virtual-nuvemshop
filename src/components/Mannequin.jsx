@@ -4,27 +4,24 @@ export default function Mannequin({ onBack, onShowRecommendation, usarMedidasMan
 
   const medidasMannequin = [{
     busto: {
-      1: 79,
-      2: 84,
-      3: 90,
-      4: 96,
-      5: 102
+  /* PP */ 1: 80,
+  /* P */ 2: 84,
+  /* M */ 3: 88,
+  /* G */ 4: 92
     },
 
     cintura: {
-      1: 60,
-      2: 66,
-      3: 74,
-      4: 80,
-      5: 86
+  /* PP */ 1: 64,
+  /* P */ 2: 68,
+  /* M */ 3: 72,
+  /* G */ 4: 76
     },
 
     quadril: {
-      1: 87,
-      2: 93,
-      3: 99,
-      4: 105,
-      5: 111
+  /* PP */ 1: 90,
+  /* P */ 2: 96,
+  /* M */ 3: 100,
+  /* G */ 4: 104
     }
   }]
 
@@ -55,15 +52,15 @@ export default function Mannequin({ onBack, onShowRecommendation, usarMedidasMan
         </h3>
         
         <label htmlFor='busto'>Busto</label>
-        <input type='range' id='busto' min='1' max='5' value={busto} onChange={(evento) => setBusto(Number(evento.target.value))}
+        <input type='range' id='busto' min='1' max='4' value={busto} onChange={(evento) => setBusto(Number(evento.target.value))}
         />
 
         <label htmlFor='cintura'>Cintura</label>
-        <input type='range' id='cintura' min='1' max='5' value={cintura} onChange={(evento) => setCintura(Number(evento.target.value))}
+        <input type='range' id='cintura' min='1' max='4' value={cintura} onChange={(evento) => setCintura(Number(evento.target.value))}
         />
 
         <label htmlFor='quadril'>Quadril</label>
-        <input type='range' id='quadril' min='1' max='5' value={quadril} onChange={(evento) => setQuadril(Number(evento.target.value))}
+        <input type='range' id='quadril' min='1' max='4' value={quadril} onChange={(evento) => setQuadril(Number(evento.target.value))}
         />
 
         <div className='card-footer-mannequin'>

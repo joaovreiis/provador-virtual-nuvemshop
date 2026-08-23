@@ -2,8 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 
 const CATEGORIAS_MEDIDAS = {
   blusa: ['busto', 'cintura', 'quadril'],
+  body: ['busto', 'cintura'],
   camisa: ['busto', 'cintura', 'quadril'],
+  cropped: ['busto', 'cintura'],
   calça: ['cintura', 'quadril', 'comprimento'],
+  short: ['cintura', 'quadril', 'comprimento'],
   vestido: ['busto', 'cintura', 'quadril', 'comprimento'],
   saia: ['cintura', 'quadril', 'comprimento']
 }
@@ -52,8 +55,7 @@ function textoAjuste(status) {
   return 'Sem medida';
 }
 
-function pontuarTamanho(tamanho, medidasCliente, categoria) {
-  const medidasRelevantes = getMedidasCategoria(categoria)
+function pontuarTamanho(tamanho, medidasCliente, medidasRelevantes) {
   const camposFiltrados = CAMPOS_MEDIDAS.filter(campo => medidasRelevantes.includes(campo.key))
   
   return camposFiltrados.reduce((score, campo) => {
@@ -108,13 +110,15 @@ export default function RecomendarTamanho({
     return tamanhos.map(normalizarTamanho).filter((tamanho) => tamanho.label);
   }, [roupaSelecionada]);
 
+  const medidasRelevantes = roupaSelecionada?.categoriaMedidas || getMedidasCategoria(roupaSelecionada?.categoria)
+
   const tamanhoIdeal = useMemo(() => {
     if (tamanhosRoupa.length === 0) return null;
 
     return tamanhosRoupa.reduce((melhor, tamanho) => (
-      pontuarTamanho(tamanho, medidasCliente, roupaSelecionada?.categoria) < pontuarTamanho(melhor, medidasCliente, roupaSelecionada?.categoria) ? tamanho : melhor
+      pontuarTamanho(tamanho, medidasCliente, medidasRelevantes) < pontuarTamanho(melhor, medidasCliente, medidasRelevantes) ? tamanho : melhor
     ), tamanhosRoupa[0]);
-  }, [tamanhosRoupa, medidasCliente, roupaSelecionada?.categoria]);
+  }, [tamanhosRoupa, medidasCliente, medidasRelevantes]);
 
   useEffect(() => {
     if (!tamanhoIdeal?.label) return;
@@ -125,7 +129,6 @@ export default function RecomendarTamanho({
 
   const tamanhoAtual = tamanhosRoupa.find((tamanho) => tamanho.label === tamanhoSelecionado) ?? tamanhoIdeal;
   const tamanhosMais = tamanhosRoupa.filter((tamanho) => tamanho.label !== tamanhoSelecionado);
-  const medidasRelevantes = getMedidasCategoria(roupaSelecionada?.categoria)
   const ajustes = CAMPOS_MEDIDAS
     .filter((campo) => medidasRelevantes.includes(campo.key))
     .map((campo) => ({
@@ -172,7 +175,7 @@ export default function RecomendarTamanho({
             <h3>Editar medidas</h3>
 
             <div className="editar-medidas-form">
-              {getMedidasCategoria(roupaSelecionada?.categoria).includes('busto') && (
+              {medidasRelevantes.includes('busto') && (
                 <>
                   <label htmlFor="editar-busto">Busto</label>
                   <div className="editar-medida-input">
@@ -182,7 +185,7 @@ export default function RecomendarTamanho({
                 </>
               )}
 
-              {getMedidasCategoria(roupaSelecionada?.categoria).includes('cintura') && (
+              {medidasRelevantes.includes('cintura') && (
                 <>
                   <label htmlFor="editar-cintura">Cintura</label>
                   <div className="editar-medida-input">
@@ -300,7 +303,7 @@ export default function RecomendarTamanho({
                 </div>
 
                 {tamanhoSelecionado !== tamanhoIdeal?.label && (
-                  <p className="tamanho-ideal-info">Ideal: {tamanhoIdeal?.label}</p>
+                  <p className="tamanho-ideal-info">Tamanho ideal: {tamanhoIdeal?.label}</p>
                 )}
               </div>
 

@@ -2,8 +2,11 @@ import guiaMedidas from '../../public/_comoMedirCrop2.jpg';
 
 const CATEGORIAS_MEDIDAS = {
   blusa: ['busto', 'cintura', 'quadril'],
+    body: ['busto', 'cintura'],
   camisa: ['busto', 'cintura', 'quadril'],
+    cropped: ['busto', 'cintura'],
   calça: ['cintura', 'quadril', 'comprimento'],
+    short: ['cintura', 'quadril', 'comprimento'],
   vestido: ['busto', 'cintura', 'quadril', 'comprimento'],
   saia: ['cintura', 'quadril', 'comprimento']
 }
@@ -15,7 +18,7 @@ function getMedidasCategoria(categoria) {
 
 export default function MedidasCliente({ onNext, busto, setBusto, cintura, setCintura, quadril, setQuadril, naoSabeMedidas, setNaoSabeMedidas, roupaSelecionada }) {
 
-    const medidasRelevantes = getMedidasCategoria(roupaSelecionada?.categoria)
+    const medidasRelevantes = roupaSelecionada?.categoriaMedidas || getMedidasCategoria(roupaSelecionada?.categoria)
     
     return (
         <div className='card card-step'>

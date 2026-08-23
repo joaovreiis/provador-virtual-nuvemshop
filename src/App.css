@@ -692,6 +692,94 @@ input::-webkit-inner-spin-button {
   width: auto;
 }
 
+.modal-admin-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-admin {
+  position: relative;
+  width: min(100%, 520px);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.modal-admin-header h3 {
+  margin: 0;
+}
+
+.categoria-medidas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0;
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.categoria-medidas legend {
+  padding: 0 6px;
+  font-weight: 700;
+}
+
+.categoria-medidas label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.categorias-lista {
+  margin-top: 24px;
+}
+
+.categorias-lista h4 {
+  margin: 0 0 10px;
+}
+
+.categoria-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid #eee;
+}
+
+.categoria-item strong,
+.categoria-item span {
+  display: block;
+}
+
+.categoria-item span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.categoria-item .btn-excluir {
+  width: auto;
+  margin: 0;
+}
+
 .pieces-grid {
   display: grid;
   gap: 12px;
@@ -942,6 +1030,7 @@ input::-webkit-inner-spin-button {
 } & .modal-recomendacao-tamanho h1 {
   color: white;
   font-size: 35px;
+  text-align: center;
 }
 
 .modal-recomendacao-tamanho2 {
@@ -1370,9 +1459,9 @@ input::-webkit-inner-spin-button {
 .tamanho-ideal-info {
   margin: 8px 0 0;
   text-align: center;
-  font-size: 12px;
+  font-size: 18px;
   font-weight: 700;
-  color: var(--muted);
+  color: red;
 }
 
 

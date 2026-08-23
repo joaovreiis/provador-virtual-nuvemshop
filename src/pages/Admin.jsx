@@ -3,7 +3,7 @@ import '../App.css'
 
 const API_BASE_URL = (import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? `${window.location.origin}/api` : 'http://localhost:3001/api')).replace(/\/$/, '')
 
-const CATEGORIAS = [
+const CATEGORIAS_PADRAO = [
   { id: 1, nome: "Blusa", medidas: ["busto", "cintura", "quadril"] },
   { id: 2, nome: "Body", medidas: ["busto", "cintura"]},
   { id: 3, nome: "Calça", medidas: ["cintura", "quadril", "comprimento"]},
@@ -11,6 +11,13 @@ const CATEGORIAS = [
   { id: 6, nome: "Cropped", medidas: ["busto", "cintura"]},
   { id: 7, nome: "Short", medidas: ["cintura", "quadril", "comprimento"]},
   { id: 8, nome: "Saia", medidas: ["cintura", "quadril", "comprimento"]}
+]
+
+const MEDIDAS_DISPONIVEIS = [
+  { chave: 'busto', nome: 'Busto' },
+  { chave: 'cintura', nome: 'Cintura' },
+  { chave: 'quadril', nome: 'Quadril' },
+  { chave: 'comprimento', nome: 'Comprimento' }
 ]
 
 const initialForm = { categoria: 'Blusa', name: '', description: '', sizes: [], image: '' }
@@ -35,6 +42,9 @@ export default function AdminPage() {
   const [form, setForm] = useState(initialForm)
   const [isLoading, setIsLoading] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(null)
+  const [categorias, setCategorias] = useState(CATEGORIAS_PADRAO)
+  const [categoriaModalAberto, setCategoriaModalAberto] = useState(false)
+  const [categoriaForm, setCategoriaForm] = useState({ nome: '', medidas: [] })
 
   async function handleLogin(e) {
     e.preventDefault()
@@ -71,7 +81,7 @@ export default function AdminPage() {
   }
 
   function addSize() {
-    const categoriaSelecionada = CATEGORIAS.find(c => c.nome === form.categoria)
+    const categoriaSelecionada = categorias.find(c => c.nome === form.categoria)
     const medidas = categoriaSelecionada?.medidas || []
     
     const measurements = {}
@@ -238,6 +248,56 @@ export default function AdminPage() {
     setForm(prev => ({ ...prev, image: '' }))
   }
 
+  async function criarCategoria(e) {
+    e.preventDefault()
+    if (!categoriaForm.nome.trim() || categoriaForm.medidas.length === 0) return
+
+    try {
+      setIsLoading(true)
+      const response = await fetch(`${API_BASE_URL}/categorias`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}`
+        },
+        body: JSON.stringify(categoriaForm)
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(data.error || 'Não foi possível criar a categoria')
+
+      setCategorias(prev => [...prev, data])
+      setCategoriaForm({ nome: '', medidas: [] })
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  async function excluirCategoria(categoria) {
+    if (!window.confirm(`Excluir a categoria ${categoria.nome}?`)) return
+
+    try {
+      setIsLoading(true)
+      const response = await fetch(`${API_BASE_URL}/categorias/${categoria.id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}` }
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(data.error || 'Não foi possível excluir a categoria')
+
+      setCategorias(prev => prev.filter(item => item.id !== categoria.id))
+      if (form.categoria === categoria.nome) {
+        const proximaCategoria = categorias.find(item => item.id !== categoria.id)
+        if (proximaCategoria) setForm(prev => ({ ...prev, categoria: proximaCategoria.nome, sizes: [] }))
+      }
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   useEffect(() => {
     try {
       localStorage.setItem('pieces', JSON.stringify(pieces))
@@ -245,6 +305,21 @@ export default function AdminPage() {
       // Ignore storage errors.
     }
   }, [pieces])
+
+  useEffect(() => {
+    async function loadCategorias() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/categorias`)
+        if (!response.ok) return
+        const data = await response.json()
+        if (Array.isArray(data) && data.length > 0) setCategorias(data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    loadCategorias()
+  }, [])
 
   useEffect(() => {
     async function loadPieces() {
@@ -273,7 +348,7 @@ export default function AdminPage() {
 
 
   function getMedidasCategoria() {
-    const categoriaSelecionada = CATEGORIAS.find(c => c.nome === form.categoria)
+    const categoriaSelecionada = categorias.find(c => c.nome === form.categoria)
     return categoriaSelecionada?.medidas || []
   }
 
@@ -329,7 +404,10 @@ export default function AdminPage() {
             className={`btn-editar ${adminView === 'list' ? 'ativo' : ''}`}
             onClick={() => setAdminView('list')}
           >
-            Ver peças cadastradas
+            Lista de peças
+          </button>
+          <button type='button' className='btn-editar' onClick={() => setCategoriaModalAberto(true)}>
+            Gerenciar categorias
           </button>
         </div>
 
@@ -340,7 +418,7 @@ export default function AdminPage() {
             <div className='form-row'>
                 <label>Selecione a categoria</label>
                 <select name='categoria' value={form.categoria} onChange={handleChange}>
-                  {CATEGORIAS.map(categoria => (
+                  {categorias.map(categoria => (
                     <option key={categoria.id} value={categoria.nome}>
                       {categoria.nome.charAt(0).toUpperCase() + categoria.nome.slice(1)}
                     </option>
@@ -624,6 +702,64 @@ export default function AdminPage() {
               >
                 Excluir
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {categoriaModalAberto && (
+        <div className='modal-admin-overlay' onClick={() => setCategoriaModalAberto(false)}>
+          <div className='modal-admin' onClick={e => e.stopPropagation()}>
+            <div className='modal-admin-header'>
+              <h3>Gerenciar categorias</h3>
+              <button type='button' className='btn-fechar-modal' onClick={() => setCategoriaModalAberto(false)} aria-label='Fechar'>X</button>
+            </div>
+
+            <form onSubmit={criarCategoria}>
+              <div className='form-row'>
+                <label htmlFor='nova-categoria'>Nome da categoria</label>
+                <input
+                  id='nova-categoria'
+                  value={categoriaForm.nome}
+                  onChange={e => setCategoriaForm(prev => ({ ...prev, nome: e.target.value }))}
+                  placeholder='Ex.: Jaqueta'
+                  required
+                />
+              </div>
+              <fieldset className='categoria-medidas'>
+                <legend>Tipos de medidas</legend>
+                {MEDIDAS_DISPONIVEIS.map(medida => (
+                  <label key={medida.chave}>
+                    <input
+                      type='checkbox'
+                      checked={categoriaForm.medidas.includes(medida.chave)}
+                      onChange={e => setCategoriaForm(prev => ({
+                        ...prev,
+                        medidas: e.target.checked
+                          ? [...prev.medidas, medida.chave]
+                          : prev.medidas.filter(item => item !== medida.chave)
+                      }))}
+                    />
+                    {medida.nome}
+                  </label>
+                ))}
+              </fieldset>
+              <button className='btn-primary' type='submit' disabled={isLoading || categoriaForm.medidas.length === 0}>
+                Criar categoria
+              </button>
+            </form>
+
+            <div className='categorias-lista'>
+              <h4>Categorias cadastradas</h4>
+              {categorias.map(categoria => (
+                <div className='categoria-item' key={categoria.id}>
+                  <div>
+                    <strong>{categoria.nome}</strong>
+                    <span>{categoria.medidas.map(medida => MEDIDAS_DISPONIVEIS.find(item => item.chave === medida)?.nome).join(', ')}</span>
+                  </div>
+                  <button type='button' className='btn-excluir' onClick={() => excluirCategoria(categoria)}>Excluir</button>
+                </div>
+              ))}
             </div>
           </div>
         </div>
