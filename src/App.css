@@ -755,6 +755,18 @@ input::-webkit-inner-spin-button {
   margin: 0 0 10px;
 }
 
+.categorias-lista > input {
+  width: 100%;
+  min-height: 48px;
+  margin-bottom: 12px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-strong);
+  color: var(--text);
+}
+
 .categoria-item {
   display: flex;
   align-items: center;

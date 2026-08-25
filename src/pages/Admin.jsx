@@ -45,6 +45,7 @@ export default function AdminPage() {
   const [categorias, setCategorias] = useState(CATEGORIAS_PADRAO)
   const [categoriaModalAberto, setCategoriaModalAberto] = useState(false)
   const [categoriaForm, setCategoriaForm] = useState({ nome: '', medidas: [] })
+  const [pesquisaCategoria, setPesquisaCategoria] = useState('')
 
   async function handleLogin(e) {
     e.preventDefault()
@@ -274,6 +275,10 @@ export default function AdminPage() {
     }
   }
 
+  const categoriasFiltradas = categorias.filter(categoria => (
+    categoria.nome.toLowerCase().includes(pesquisaCategoria.trim().toLowerCase())
+  ))
+
   async function excluirCategoria(categoria) {
     if (!window.confirm(`Excluir a categoria ${categoria.nome}?`)) return
 
@@ -407,7 +412,7 @@ export default function AdminPage() {
             Lista de peças
           </button>
           <button type='button' className='btn-editar' onClick={() => setCategoriaModalAberto(true)}>
-            Gerenciar categorias
+            Categorias
           </button>
         </div>
 
@@ -750,8 +755,15 @@ export default function AdminPage() {
             </form>
 
             <div className='categorias-lista'>
-              <h4>Categorias cadastradas</h4>
-              {categorias.map(categoria => (
+              <h4>Lista de categorias</h4>
+              <input
+                type='search'
+                aria-label='Pesquisar categorias'
+                placeholder='Pesquisar categoria'
+                value={pesquisaCategoria}
+                onChange={e => setPesquisaCategoria(e.target.value)}
+              />
+              {categoriasFiltradas.map(categoria => (
                 <div className='categoria-item' key={categoria.id}>
                   <div>
                     <strong>{categoria.nome}</strong>
@@ -760,6 +772,7 @@ export default function AdminPage() {
                   <button type='button' className='btn-excluir' onClick={() => excluirCategoria(categoria)}>Excluir</button>
                 </div>
               ))}
+              {categoriasFiltradas.length === 0 && <p className='description'>Nenhuma categoria encontrada.</p>}
             </div>
           </div>
         </div>
