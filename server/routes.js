@@ -156,3 +156,4 @@ router.delete('/roupas/:id', async (req, res) => {
 });
 
 export default router;
+
