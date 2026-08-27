@@ -43,14 +43,14 @@ function classificarAjuste(medidaCliente, medidaRoupa) {
 
   const folga = medidaRoupa - medidaCliente;
 
-  if (folga < -2) return 'apertado';
-  if (folga > 5) return 'folgado';
+  if (folga < -2 || folga > 6) return 'critico';
+  if (folga > 3) return 'atencao';
   return 'perfeito';
 }
 
-function textoAjuste(status) {
-  if (status === 'apertado') return 'Apertada';
-  if (status === 'folgado') return 'Folgado';
+function textoAjuste(status, folga) {
+  if (status === 'critico') return folga < 0 ? 'Muito apertado' : 'Muito folgado';
+  if (status === 'atencao') return folga < 0 ? 'Justo' : 'Folgado';
   if (status === 'perfeito') return 'Perfeito';
   return 'Sem medida';
 }
@@ -79,6 +79,7 @@ export default function RecomendarTamanho({
   onSizeChange,
   altura,
   peso,
+  idade,
   busto,
   setBusto,
   cintura,
@@ -90,6 +91,7 @@ export default function RecomendarTamanho({
 }) {
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState(tamanhoRecomendado);
   const [editandoMedidas, setEditandoMedidas] = useState(false);
+  const [mostrarMedidas, setMostrarMedidas] = useState(false);
   const [medidasEditadas, setMedidasEditadas] = useState({
     busto: busto ?? '',
     cintura: cintura ?? '',
@@ -98,6 +100,8 @@ export default function RecomendarTamanho({
   });
 
   const mannequinSrc = `/mannequin_formatos/${formatoCorpo || '030303'}.jpg`;
+  const imagemRoupa = roupaSelecionada?.imagem || roupaSelecionada?.image || '/produtos/produto1.png';
+  const nomeRoupa = roupaSelecionada?.nome || roupaSelecionada?.name || 'Peça selecionada';
   const medidasCliente = useMemo(() => ({
     busto: medidaNumero(busto),
     cintura: medidaNumero(cintura),
@@ -133,6 +137,9 @@ export default function RecomendarTamanho({
     .filter((campo) => medidasRelevantes.includes(campo.key))
     .map((campo) => ({
       ...campo,
+      folga: tamanhoAtual?.[campo.key] == null || medidasCliente[campo.key] == null
+        ? null
+        : tamanhoAtual[campo.key] - medidasCliente[campo.key],
       status: classificarAjuste(medidasCliente[campo.key], tamanhoAtual?.[campo.key])
     }));
 
@@ -222,96 +229,102 @@ export default function RecomendarTamanho({
             </div>
           </div>
         ) : (
-          <div className="recomendacao-content">
-            <section className="recomendacao-medidas">
-              <h3>Medidas corporais</h3>
-              <div className="medidas-info">
-                <div className="medida-item">
-                  <span className="medida-label">Altura</span>
-                  <span className="medida-valor">{altura} cm</span>
-                </div>
-                <div className="medida-item">
-                  <span className="medida-label">Peso</span>
-                  <span className="medida-valor">{peso} kg</span>
-                </div>
-                {getMedidasCategoria(roupaSelecionada?.categoria).includes('busto') && (
-                  <div className="medida-item">
-                    <span className="medida-label">Busto</span>
-                    <span className="medida-valor">{busto} cm</span>
-                  </div>
-                )}
-                {getMedidasCategoria(roupaSelecionada?.categoria).includes('cintura') && (
-                  <div className="medida-item">
-                    <span className="medida-label">Cintura</span>
-                    <span className="medida-valor">{cintura} cm</span>
-                  </div>
-                )}
-                {getMedidasCategoria(roupaSelecionada?.categoria).includes('quadril') && (
-                  <div className="medida-item">
-                    <span className="medida-label">Quadril</span>
-                    <span className="medida-valor">{quadril} cm</span>
-                  </div>
-                )}
-                <button className="btn-editar" onClick={abrirEdicaoMedidas} type="button">Editar medidas</button>
+          <div className="resultado-modal">
+            <section className="resultado-foto" style={{ backgroundImage: `url(${imagemRoupa})` }} aria-label={nomeRoupa}>
+              <div className="resultado-logo">
+                <span>CROP.</span>
               </div>
+              <button className="resultado-label-medidas" type="button" onClick={() => setMostrarMedidas(true)}>
+                Medidas<br />corporais
+              </button>
             </section>
 
-            <section className="recomendacao-centro">
-              <div className="recomendacao-mannequin">
-                <div className="mannequin-placeholder">
-                  <img src={mannequinSrc} alt={`Mannequin ${formatoCorpo || '030303'}`} />
-                  {ajustes.map((ajuste) => (
-                    <span key={ajuste.key} className={`faixa-ajuste faixa-${ajuste.posicao} ${ajuste.status}`}>
-                      {ajuste.label}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="ajuste-indicators">
-                  {ajustes.map((ajuste) => (
-                    <div key={ajuste.key} className={`ajuste-item ${ajuste.status}`}>
-                      <span className="ajuste-dot"></span>
-                      <span>{ajuste.label}: {textoAjuste(ajuste.status)}</span>
-                    </div>
-                  ))}
-                </div>
+            <section className="resultado-painel">
+              <div className="resultado-titulo">MELHOR OPÇÃO</div>
+              <div className="resultado-usuario" aria-hidden="true">
+                <span className="usuario-cabeca"></span>
+                <span className="usuario-corpo"></span>
               </div>
-            </section>
 
-            <section className="recomendacao-tamanhos">
-              <p className="tamanhos-titulo">Prove também os tamanhos:</p>
+              <div className="resultado-tamanho-recomendado">
+                <div className="resultado-card-tamanho">
+                  <span>{tamanhoIdeal?.label || tamanhoSelecionado || 'N/A'}</span>
+                  <span className="resultado-check">✓</span>
+                </div>
+                <button className="resultado-editar" onClick={abrirEdicaoMedidas} type="button">Editar Medidas</button>
+              </div>
 
-              <div className="tamanhos-grid">
-                {tamanhosMais.map((tamanho) => (
-                  <button
-                    key={tamanho.label}
-                    className={`btn-tamanho ${tamanho.label === tamanhoSelecionado ? 'ativo' : ''}`}
-                    onClick={() => handleSizeChange(tamanho.label)}
-                  >
-                    {tamanho.label.toUpperCase()}
-                  </button>
+              <div className="resultado-medidas-detalhes" aria-label="Medidas corporais">
+                <span>Altura: {altura} cm</span>
+                <span>Peso: {peso} kg</span>
+                <span>Idade: {idade || 'não informada'}</span>
+                {getMedidasCategoria(roupaSelecionada?.categoria).includes('busto') && <span>Busto: {busto || '-'} cm</span>}
+                {getMedidasCategoria(roupaSelecionada?.categoria).includes('cintura') && <span>Cintura: {cintura || '-'} cm</span>}
+                {getMedidasCategoria(roupaSelecionada?.categoria).includes('quadril') && <span>Quadril: {quadril || '-'} cm</span>}
+              </div>
+
+              <div className="resultado-manequim">
+                <img src={mannequinSrc} alt={`Mannequin ${formatoCorpo || '030303'}`} />
+                {ajustes.map((ajuste) => (
+                  <span key={ajuste.key} className={`resultado-faixa resultado-faixa-${ajuste.posicao} ${ajuste.status}`} />
                 ))}
               </div>
 
-              <div className="container-modal-recomedadacao-tamanho">
-                <h3>{tamanhoSelecionado === tamanhoIdeal?.label ? 'Tamanho recomendado:' : 'Tamanho selecionado:'}</h3>
-
-                <div className="modal-recomendacao-tamanho2">
-                  <div className="modal-recomendacao-tamanho">
-                    <h1>{tamanhoSelecionado.toUpperCase()}</h1>
+              <div className="resultado-indicadores">
+                {ajustes.filter((ajuste) => ajuste.key !== 'comprimento').map((ajuste) => (
+                  <div key={ajuste.key} className="resultado-indicador">
+                    <span className={`resultado-icone-medida ${ajuste.status}`}>↔</span>
+                    <span>{textoAjuste(ajuste.status, ajuste.folga).toLowerCase()}</span>
                   </div>
-                </div>
-
-                {tamanhoSelecionado !== tamanhoIdeal?.label && (
-                  <p className="tamanho-ideal-info">Tamanho ideal: {tamanhoIdeal?.label}</p>
-                )}
+                ))}
               </div>
 
-              <button className="btn-fechar-principal" onClick={onClose}>FECHAR</button>
+              <div className="resultado-outros-tamanhos">
+                <div className="resultado-titulo-outros">Prove também os tamanhos:</div>
+                <div className="resultado-opcoes">
+                  {tamanhosRoupa.map((tamanho) => (
+                    <button
+                      key={tamanho.label}
+                      className={`resultado-opcao ${tamanho.label === tamanhoSelecionado ? 'selecionado' : ''}`}
+                      onClick={() => handleSizeChange(tamanho.label)}
+                    >
+                      {tamanho.label.toUpperCase()}
+                      {tamanho.label === tamanhoSelecionado && <span className="resultado-mini-check">✓</span>}
+                    </button>
+                  ))}
+                  <span className="resultado-seta" aria-hidden="true">›</span>
+                </div>
+              </div>
+
+              <button className="resultado-fechar" onClick={onClose}>FECHAR</button>
             </section>
           </div>
         )}
       </div>
+
+      {mostrarMedidas && (
+        <div className="medidas-drawer-overlay" onClick={(evento) => { evento.stopPropagation(); setMostrarMedidas(false); }}>
+          <aside className="medidas-drawer" onClick={(evento) => evento.stopPropagation()} aria-label="Medidas corporais do cliente">
+            <button className="medidas-drawer-fechar" type="button" onClick={() => setMostrarMedidas(false)} aria-label="Fechar medidas">x</button>
+            <p className="medidas-drawer-eyebrow">SEU PERFIL</p>
+            <h2>Medidas corporais</h2>
+            <p className="medidas-drawer-descricao">Informações usadas para calcular o tamanho recomendado.</p>
+
+            <div className="medidas-drawer-lista">
+              <div><span>Altura</span><strong>{altura || '-'} cm</strong></div>
+              <div><span>Peso</span><strong>{peso || '-'} kg</strong></div>
+              <div><span>Idade</span><strong>{idade || '-'} anos</strong></div>
+              {getMedidasCategoria(roupaSelecionada?.categoria).includes('busto') && <div><span>Busto</span><strong>{busto || '-'} cm</strong></div>}
+              {getMedidasCategoria(roupaSelecionada?.categoria).includes('cintura') && <div><span>Cintura</span><strong>{cintura || '-'} cm</strong></div>}
+              {getMedidasCategoria(roupaSelecionada?.categoria).includes('quadril') && <div><span>Quadril</span><strong>{quadril || '-'} cm</strong></div>}
+            </div>
+
+            <button className="medidas-drawer-editar" type="button" onClick={() => { setMostrarMedidas(false); abrirEdicaoMedidas(); }}>
+              Editar medidas
+            </button>
+          </aside>
+        </div>
+      )}
     </div>
   );
 }

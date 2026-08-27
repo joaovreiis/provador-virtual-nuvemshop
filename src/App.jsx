@@ -12,9 +12,9 @@ export default function App() {
   const [mostrarRecomendacao, setMostrarRecomendacao] = useState(false)
   const [tamanhoRecomendado, setTamanhoRecomendado] = useState('P')
   const [route, setRoute] = useState(location.hash || '')
-  const [altura, setAltura] = useState()
-  const [peso, setPeso] = useState()
-  const [idade, setIdade] = useState()
+  const [altura, setAltura] = useState('')
+  const [peso, setPeso] = useState('')
+  const [idade, setIdade] = useState('')
   const [busto, setBusto] = useState()
   const [cintura, setCintura] = useState()
   const [quadril, setQuadril] = useState()
@@ -83,6 +83,7 @@ export default function App() {
           onSizeChange={setTamanhoRecomendado}
           altura={altura}
           peso={peso}
+          idade={idade}
           busto={busto}
           setBusto={setBusto}
           cintura={cintura}
