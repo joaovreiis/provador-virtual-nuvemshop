@@ -12,6 +12,7 @@ export default function App() {
   const [mostrarRecomendacao, setMostrarRecomendacao] = useState(false)
   const [tamanhoRecomendado, setTamanhoRecomendado] = useState('P')
   const [route, setRoute] = useState(location.hash || '')
+  const [medidasModalAberto, setMedidasModalAberto] = useState(false)
   const [altura, setAltura] = useState('')
   const [peso, setPeso] = useState('')
   const [idade, setIdade] = useState('')
@@ -47,7 +48,7 @@ export default function App() {
   const handleSelecionarRoupa = (roupa) => {
     setRoupaSelecionada(roupa)
     setNaoSabeMedidas(false)
-    setStep(1)
+    setMedidasModalAberto(true)
   }
 
   return (
@@ -65,12 +66,22 @@ export default function App() {
         ) : (
           <>
             {step === 0 && <SelecionarRoupa roupaSelecionada={roupaSelecionada} setRoupaSelecionada={setRoupaSelecionada} onNext={handleSelecionarRoupa} />}
-            {step === 1 && <CalculoAlturaPeso onNext={() => setStep(2)} altura={altura} setAltura={setAltura} peso={peso} setPeso={setPeso} idade={idade} setIdade={setIdade} roupaSelecionada={roupaSelecionada} />}
+            {step === 1 && <CalculoAlturaPeso onNext={() => { setMedidasModalAberto(false); setStep(2) }} altura={altura} setAltura={setAltura} peso={peso} setPeso={setPeso} idade={idade} setIdade={setIdade} roupaSelecionada={roupaSelecionada} />}
             {step === 2 && <MedidasCliente onNext={() => setStep(3)} busto={busto} setBusto={setBusto} cintura={cintura} setCintura={setCintura} quadril={quadril} setQuadril={setQuadril} naoSabeMedidas={naoSabeMedidas} setNaoSabeMedidas={setNaoSabeMedidas} roupaSelecionada={roupaSelecionada} />}
             {step === 3 && <Mannequin onBack={() => setStep(0)} onShowRecommendation={handleShowRecommendation} usarMedidasMannequin={naoSabeMedidas} altura={altura} peso={peso} busto={busto} cintura={cintura} quadril={quadril} roupaSelecionada={roupaSelecionada} />}
           </>
         )}
       </section>
+
+      {step === 0 && medidasModalAberto && (
+        <div className='medidas-modal-overlay' onClick={() => setMedidasModalAberto(false)}>
+          <div className='medidas-modal' role='dialog' aria-modal='true' aria-labelledby='medidas-modal-title' onClick={(event) => event.stopPropagation()}>
+            <button className='medidas-modal-close' type='button' aria-label='Fechar formulário de medidas' onClick={() => setMedidasModalAberto(false)}>x</button>
+            <h2 id='medidas-modal-title' className='sr-only'>Informe suas medidas</h2>
+            <CalculoAlturaPeso onNext={() => { setMedidasModalAberto(false); setStep(2) }} altura={altura} setAltura={setAltura} peso={peso} setPeso={setPeso} idade={idade} setIdade={setIdade} roupaSelecionada={roupaSelecionada} />
+          </div>
+        </div>
+      )}
 
       {mostrarRecomendacao && (
         <RecomendarTamanho 

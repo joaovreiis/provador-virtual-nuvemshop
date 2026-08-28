@@ -487,6 +487,282 @@ input::-webkit-inner-spin-button {
   max-width: 240px;
 }
 
+.medidas-step {
+  display: grid;
+  grid-template-columns: minmax(260px, 372px) minmax(0, 1fr);
+  min-height: 507px;
+  padding: 0;
+  overflow: hidden;
+  border: 3px solid #1a1a1a;
+  border-radius: 0;
+  background: #fff;
+}
+
+.medidas-step-visual {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 100%;
+  overflow: hidden;
+  background: linear-gradient(160deg, #e8c3cf 0%, #c99aa8 45%, #8f6b74 100%);
+}
+
+.medidas-step-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.medidas-step-logo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 26px 16px 18px;
+  background: #fff;
+  border-bottom-right-radius: 24px;
+}
+
+.medidas-step-logo strong {
+  color: #222;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 3px;
+}
+
+.medidas-step-logo span {
+  margin-top: 2px;
+  color: #999;
+  font-size: 8px;
+  letter-spacing: 3px;
+}
+
+.medidas-step-product {
+  position: absolute;
+  bottom: 14px;
+  max-width: calc(100% - 28px);
+  padding: 5px 10px;
+  color: #222;
+  font-size: 13px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.medidas-step-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 40px 44px;
+  color: #1a1a1a;
+}
+
+.medidas-step-content h2 {
+  margin: 0;
+  color: #1a1a1a;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.medidas-step-subtitle {
+  margin: 14px 0 34px;
+  color: #555;
+  font-size: 14px;
+}
+
+.medidas-step-field {
+  margin-bottom: 18px;
+}
+
+.medidas-step-field label {
+  display: block;
+  margin-bottom: 8px;
+  color: #222;
+  font-size: 13px;
+}
+
+.medidas-step-field-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #333;
+  font-size: 13px;
+}
+
+.medidas-step-field-row input {
+  width: 170px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  outline: none;
+  background: #fff;
+  color: #222;
+  font-size: 14px;
+}
+
+.medidas-step-field-row input:focus {
+  border-color: #555;
+  box-shadow: 0 0 0 2px rgba(85, 85, 85, 0.15);
+}
+
+.medidas-step-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  margin-left: 2px;
+  border-radius: 50%;
+  background: #333;
+  color: #fff;
+  font-size: 10px;
+}
+
+.medidas-step-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: auto;
+}
+
+.medidas-step-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.medidas-step-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ccc;
+}
+
+.medidas-step-dots span.active {
+  background: #333;
+}
+
+.medidas-step-next {
+  padding: 11px 26px;
+  border: 0;
+  border-radius: 4px;
+  background: #8a8a8a;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.medidas-step-next:hover:not(:disabled) {
+  background: #767676;
+}
+
+.medidas-step-next:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.medidas-modal-overlay {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.64);
+}
+
+.medidas-modal {
+  position: relative;
+  width: min(915px, 100%);
+  max-height: calc(100vh - 32px);
+}
+
+.medidas-modal .medidas-step {
+  max-height: calc(100vh - 32px);
+}
+
+.medidas-modal-close {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #222;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.medidas-modal-close:hover {
+  background: #fff;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 920px) {
+  .medidas-step {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    min-height: 460px;
+  }
+
+  .medidas-step-content {
+    padding: 28px 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .medidas-step {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .medidas-step-visual {
+    min-height: 240px;
+  }
+
+  .medidas-step-content {
+    min-height: 430px;
+    padding: 28px 20px 20px;
+  }
+
+  .medidas-step-content h2 {
+    font-size: 20px;
+  }
+
+  .medidas-step-field-row input {
+    width: min(170px, 100%);
+  }
+
+  .medidas-modal-overlay {
+    padding: 8px;
+  }
+
+  .medidas-modal,
+  .medidas-modal .medidas-step {
+    max-height: calc(100vh - 16px);
+  }
+}
+
 .selecionar-roupa-header {
   max-width: 100%;
   margin-bottom: 55px;

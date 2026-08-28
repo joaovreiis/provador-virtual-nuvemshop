@@ -22,6 +22,10 @@ const CATEGORIAS_PADRAO = [
 ]
 const API_BASE_URL = (import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? `${window.location.origin}/api` : 'http://localhost:3001/api')).replace(/\/$/, '')
 
+function normalizarCategoria(categoria) {
+  return String(categoria ?? '').trim().toLocaleLowerCase('pt-BR')
+}
+
 function carregarRoupasLocais() {
   try {
     const raw = localStorage.getItem('pieces')
@@ -106,7 +110,7 @@ export default function SelecionarRoupa({ roupaSelecionada, setRoupaSelecionada,
     const pesquisaBaixa = pesquisa.toLowerCase()
     const matchPesquisa = roupa.nome.toLowerCase().includes(pesquisaBaixa) || 
                          roupa.descricao.toLowerCase().includes(pesquisaBaixa)
-    const matchCategoria = !categoriaFiltro || roupa.categoria === categoriaFiltro
+    const matchCategoria = !categoriaFiltro || normalizarCategoria(roupa.categoria) === normalizarCategoria(categoriaFiltro)
     return matchPesquisa && matchCategoria
   })
 
