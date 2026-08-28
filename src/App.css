@@ -2220,10 +2220,11 @@ input::-webkit-inner-spin-button {
 .resultado-outros-tamanhos { position: absolute; left: 51px; bottom: 31px; z-index: 5; width: 280px; }
 .resultado-titulo-outros { width: 260px; height: 27px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; border-radius: 3px; color: #333; font-size: 12px; }
 .resultado-opcoes { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
-.resultado-opcao { position: relative; width: 80px; height: 29px; border: 1px solid #ddd; background: #fff; color: #222; cursor: pointer; font-size: 12px; }
+.resultado-opcao { position: relative; width: 68px; height: 29px; border: 1px solid #ddd; background: #fff; color: #222; cursor: pointer; font-size: 12px; }
 .resultado-opcao.selecionado { border-color: #000; background: #000; color: #fff; }
 .resultado-mini-check { position: absolute; top: -9px; right: -7px; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #70d1b4; color: #fff; font-size: 11px; }
-.resultado-seta { margin-left: -1px; color: #222; font-size: 26px; }
+.resultado-seta { width: 18px; height: 29px; margin: 0; padding: 0; border: 0; background: transparent; color: #222; cursor: pointer; font-size: 26px; line-height: 24px; }
+.resultado-seta:disabled { color: #c7c7c7; cursor: default; }
 .resultado-fechar { position: absolute; right: 27px; bottom: 35px; z-index: 5; width: 106px; height: 32px; border: none; background: #000; color: #fff; cursor: pointer; font-size: 12px; font-weight: 700; }
 
 @media (max-width: 700px) {
@@ -2550,10 +2551,11 @@ input::-webkit-inner-spin-button {
 .resultado-outros-tamanhos { position: absolute; left: 51px; bottom: 31px; z-index: 5; width: 280px; }
 .resultado-titulo-outros { width: 260px; height: 27px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; border-radius: 3px; color: #333; font-size: 12px; }
 .resultado-opcoes { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
-.resultado-opcao { position: relative; width: 80px; height: 29px; border: 1px solid #ddd; background: #fff; color: #222; cursor: pointer; font-size: 12px; }
+.resultado-opcao { position: relative; width: 68px; height: 29px; border: 1px solid #ddd; background: #fff; color: #222; cursor: pointer; font-size: 12px; }
 .resultado-opcao.selecionado { border-color: #000; background: #000; color: #fff; }
 .resultado-mini-check { position: absolute; top: -9px; right: -7px; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #70d1b4; color: #fff; font-size: 11px; }
-.resultado-seta { margin-left: -1px; color: #222; font-size: 26px; }
+.resultado-seta { width: 18px; height: 29px; margin: 0; padding: 0; border: 0; background: transparent; color: #222; cursor: pointer; font-size: 26px; line-height: 24px; }
+.resultado-seta:disabled { color: #c7c7c7; cursor: default; }
 .resultado-fechar { position: absolute; right: 27px; bottom: 35px; z-index: 5; width: 106px; height: 32px; border: none; background: #000; color: #fff; cursor: pointer; font-size: 12px; font-weight: 700; }
 
 @media (max-width: 700px) {

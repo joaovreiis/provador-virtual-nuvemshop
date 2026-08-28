@@ -92,6 +92,7 @@ export default function RecomendarTamanho({
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState(tamanhoRecomendado);
   const [editandoMedidas, setEditandoMedidas] = useState(false);
   const [mostrarMedidas, setMostrarMedidas] = useState(false);
+  const [indiceCarrossel, setIndiceCarrossel] = useState(0);
   const [medidasEditadas, setMedidasEditadas] = useState({
     busto: busto ?? '',
     cintura: cintura ?? '',
@@ -132,7 +133,8 @@ export default function RecomendarTamanho({
   }, [tamanhoIdeal?.label, onSizeChange]);
 
   const tamanhoAtual = tamanhosRoupa.find((tamanho) => tamanho.label === tamanhoSelecionado) ?? tamanhoIdeal;
-  const tamanhosMais = tamanhosRoupa.filter((tamanho) => tamanho.label !== tamanhoSelecionado);
+  const maxIndiceCarrossel = Math.max(0, tamanhosRoupa.length - 3);
+  const tamanhosVisiveis = tamanhosRoupa.slice(indiceCarrossel, indiceCarrossel + 3);
   const ajustes = CAMPOS_MEDIDAS
     .filter((campo) => medidasRelevantes.includes(campo.key))
     .map((campo) => ({
@@ -282,17 +284,35 @@ export default function RecomendarTamanho({
               <div className="resultado-outros-tamanhos">
                 <div className="resultado-titulo-outros">Prove também os tamanhos:</div>
                 <div className="resultado-opcoes">
-                  {tamanhosRoupa.map((tamanho) => (
+                  <button
+                    className="resultado-seta resultado-seta-anterior"
+                    type="button"
+                    aria-label="Mostrar tamanhos anteriores"
+                    onClick={() => setIndiceCarrossel((indice) => Math.max(0, indice - 1))}
+                    disabled={indiceCarrossel === 0}
+                  >
+                    ‹
+                  </button>
+                  {tamanhosVisiveis.map((tamanho) => (
                     <button
                       key={tamanho.label}
                       className={`resultado-opcao ${tamanho.label === tamanhoSelecionado ? 'selecionado' : ''}`}
+                      type="button"
                       onClick={() => handleSizeChange(tamanho.label)}
                     >
                       {tamanho.label.toUpperCase()}
                       {tamanho.label === tamanhoSelecionado && <span className="resultado-mini-check">✓</span>}
                     </button>
                   ))}
-                  <span className="resultado-seta" aria-hidden="true">›</span>
+                  <button
+                    className="resultado-seta resultado-seta-proxima"
+                    type="button"
+                    aria-label="Mostrar próximos tamanhos"
+                    onClick={() => setIndiceCarrossel((indice) => Math.min(maxIndiceCarrossel, indice + 1))}
+                    disabled={indiceCarrossel >= maxIndiceCarrossel}
+                  >
+                    ›
+                  </button>
                 </div>
               </div>
 
