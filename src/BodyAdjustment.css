@@ -1,0 +1,332 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital@1&display=swap');
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.screen-container {
+  position: relative;
+  width: 100%;
+  max-width: 948px;
+  background-color: #ffffff;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  font-family: 'Montserrat', sans-serif;
+  box-sizing: border-box;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* Logo no Canto Superior Esquerdo */
+.logo-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #ffffff;
+  padding: 16px 28px 14px 28px;
+  border-bottom-right-radius: 20px;
+  box-shadow: 0 4px 16px #c0c0c0;
+  text-align: center;
+  z-index: 10;
+}
+
+.logo-badge .brand-name {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #111111;
+}
+
+.logo-badge .brand-sub {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: #666666;
+  letter-spacing: 1px;
+  margin-top: 1px;
+}
+
+/* Coluna Esquerda: Visual do Manequim */
+.visual-column {
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  background: white;
+}
+
+.mannequin-container {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: sticky;
+}
+
+.mannequin-svg {
+  position: sticky;
+  scale: 1.6;
+  top: 95px;
+  right: 210px;
+  height: 520px;
+  width: auto;
+  filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.05));
+}
+
+/* Paleta de Cores */
+.skin-palette {
+  position: absolute;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 5;
+}
+
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, outline 0.2s;
+  padding: 0;
+}
+
+.color-swatch:hover {
+  transform: scale(1.1);
+}
+
+.color-swatch.active {
+  outline: 2px solid #555555;
+  outline-offset: 2px;
+}
+
+/* Coluna Direita: Controles */
+.controls-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0px 50px 0px 50px;
+}
+
+.main-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111111;
+  margin-bottom: 16px;
+  letter-spacing: -0.5px;
+}
+
+.description {
+  font-size: 14.5px;
+  line-height: 1.45;
+  color: #4a4a4a;
+  max-width: 420px;
+  margin-bottom: 32px;
+  font-weight: 400;
+}
+
+/* Grupos dos Sliders */
+.adjustment-group {
+  max-width: 300px;
+}
+
+.group-label {
+  text-align: center;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #555555;
+  margin-bottom: 8px;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-step {
+  width: 36px;
+  height: 36px;
+  background: #ffffff;
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #444444;
+  cursor: pointer;
+  transition: background-color 0.15s, transform 0.1s;
+}
+
+.btn-step:hover {
+  background-color: #fafafa;
+}
+
+.btn-step:active {
+  transform: scale(0.95);
+}
+
+.slider-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 36px;
+}
+
+.ruler-track {
+  position: absolute;
+  width: 100%;
+  height: 1.5px;
+  background-color: #666666;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.ruler-tick {
+  width: 1.5px;
+  height: 10px;
+  background-color: #666666;
+}
+
+.range-input {
+  position: relative;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  outline: none;
+  margin: 0;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #2b2b2b;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.range-input::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #2b2b2b;
+  border: none;
+  cursor: pointer;
+}
+
+.range-input::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Rodapé / Botões */
+.footer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 36px;
+  max-width: 440px;
+}
+
+.pagination-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #cccccc;
+}
+
+.dot.active {
+  background-color: #333333;
+}
+
+.buttons-group {
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  padding: 3px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+.btn-back {
+  background-color: #dce0e4;
+  color: #3e4854;
+}
+
+.btn-back:hover {
+  background-color: #d0d5da;
+}
+
+.btn-next {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.btn-next:hover {
+  opacity: 0.88;
+}
+
+/* Responsividade */
+@media (max-width: 860px) {
+  .screen-container {
+    grid-template-columns: 1fr;
+    padding: 60px 24px 30px;
+    gap: 30px;
+  }
+
+  .controls-column {
+    padding-left: 0;
+  }
+
+  .visual-column {
+    height: 380px;
+  }
+
+  .mannequin-svg {
+    height: 360px;
+  }
+
+  .skin-palette {
+    right: 10px;
+  }
+}
