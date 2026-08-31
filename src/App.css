@@ -53,6 +53,62 @@ body,
   overflow-x: hidden;
 }
 
+.orientation-warning-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  background: rgba(245, 247, 251, 0.95);
+  backdrop-filter: blur(2px);
+}
+
+.orientation-warning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(18px, 4vw, 72px);
+  width: min(92vw, 980px);
+  padding: 16px 20px;
+}
+
+.orientation-warning-copy {
+  flex: 1;
+  max-width: 520px;
+  text-align: left;
+}
+
+.orientation-warning-copy h2 {
+  margin: 0;
+  font-size: clamp(2.2rem, 4vw, 4rem);
+  line-height: 1.08;
+  font-weight: 700;
+  color: #111827;
+}
+
+.orientation-warning-copy p {
+  margin: 18px 0 0;
+  font-size: clamp(1.1rem, 2vw, 1.8rem);
+  line-height: 1.35;
+  color: rgba(17, 24, 39, 0.75);
+  font-style: italic;
+}
+
+.orientation-device {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(36vw, 310px);
+  min-width: 220px;
+}
+
+.orientation-illustration {
+  display: block;
+  width: min(100%, 270px);
+  height: auto;
+  filter: drop-shadow(0 12px 24px rgba(17, 24, 39, 0.08));
+}
+
 .page-content {
   display: grid;
   gap: 20px;
@@ -94,6 +150,50 @@ body,
   justify-content: space-between;
   padding-top: 0;
   width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .app {
+    width: min(100%, calc(100% - 20px));
+    padding: 20px 0 28px;
+  }
+
+  .orientation-warning {
+    width: min(92vw, 860px);
+    gap: 24px;
+  }
+
+  .card-content,
+  .boneco,
+  .piece-details-grid,
+  .editar-medidas-content {
+    grid-template-columns: 1fr;
+  }
+
+  .card-step,
+  .boneco {
+    min-height: auto;
+    padding: 20px;
+  }
+
+  .card-copy {
+    max-width: none;
+  }
+
+  .card-footer {
+    justify-content: stretch;
+  }
+
+  .card-footer .btn-primary,
+  .card-footer .btn-voltar {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .boneco img {
+    max-height: 420px;
+  }
 }
 
 @media (max-width: 920px) {
@@ -148,6 +248,26 @@ body,
     padding: 16px 0 24px;
   }
 
+  .orientation-warning-overlay {
+    background: rgba(247, 247, 247, 0.96);
+  }
+
+  .orientation-warning {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .orientation-warning-copy {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .orientation-device {
+    width: min(72vw, 280px);
+    height: 185px;
+  }
+
   .app-header h1 {
     font-size: clamp(22px, 3vw, 30px);
   }
@@ -183,6 +303,47 @@ body,
 
   .card-footer-mannequin {
     flex-direction: column;
+  }
+
+  .recomendacao-content {
+    grid-template-columns: 1fr;
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .recomendacao-medidas {
+    min-width: 0;
+  }
+
+  .medidas-info {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .medidas-step {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    height: auto;
+  }
+
+  .medidas-step-visual {
+    min-height: 240px;
+  }
+
+  .medidas-step-content {
+    min-height: unset;
+    padding: 24px 18px 18px;
+  }
+
+  .medidas-step-field-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .medidas-step-field-row input {
+    width: 100%;
   }
 }
 
@@ -266,6 +427,25 @@ body,
   .btn-voltar,
   .btn-proximo {
     width: 100%;
+  }
+
+  .medidas-modal-overlay,
+  .modal-recomendacao-overlay {
+    padding: 8px;
+  }
+
+  .modal-recomendacao {
+    max-height: calc(100vh - 16px);
+  }
+
+  .recomendacao-mannequin {
+    max-width: 180px;
+  }
+
+  .tamanho-badge {
+    width: 64px;
+    height: 64px;
+    font-size: 26px;
   }
 }
 
@@ -967,14 +1147,68 @@ input::-webkit-inner-spin-button {
 }
 
 @media (max-width: 640px) {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  .app {
+    width: 100%;
+    min-height: 100dvh;
+    padding: 12px;
+  }
+
+  .medidas-modal-overlay {
+    align-items: stretch;
+    justify-items: stretch;
+    padding: 0;
+    overflow: auto;
+    background: #fff;
+  }
+
+  .medidas-modal,
   .selecionar-roupa-modal {
-    width: min(96vw, 740px);
+    width: 100%;
+    min-height: 100dvh;
+    max-height: none;
+  }
+
+  .medidas-modal-content {
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .medidas-modal .medidas-step {
+    min-height: 100dvh;
+    height: auto;
+    max-height: none;
+    border-width: 0;
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  .medidas-step-visual {
+    display: none;
+  }
+
+  .medidas-modal .medidas-step-content {
+    min-height: 100dvh;
+    padding: 64px 24px 24px;
+    overflow: visible;
+  }
+
+  .selecionar-roupa-modal {
+    display: flex;
+    flex-direction: column;
   }
 
   .selecionar-roupa-modal .card-step {
-    min-height: 320px;
-    max-height: min(72vh, 480px);
+    flex: 1;
+    min-height: 100dvh;
+    max-height: none;
     padding: 14px 12px 10px;
+    border-width: 0;
   }
 
   .selecionar-roupa-modal .head,
@@ -1007,12 +1241,8 @@ input::-webkit-inner-spin-button {
     min-height: 0;
   }
 
-  .medidas-step-visual {
-    min-height: 240px;
-  }
-
   .medidas-step-content {
-    min-height: 430px;
+    min-height: 100%;
     padding: 28px 20px 20px;
   }
 
@@ -1024,13 +1254,9 @@ input::-webkit-inner-spin-button {
     width: min(170px, 100%);
   }
 
-  .medidas-modal-overlay {
-    padding: 8px;
-  }
-
-  .medidas-modal,
-  .medidas-modal .medidas-step {
-    max-height: calc(100vh - 16px);
+  .medidas-modal-close {
+    top: 14px;
+    right: 14px;
   }
 }
 
@@ -3362,9 +3588,20 @@ input::-webkit-inner-spin-button {
 }
 
 @media (max-width: 700px) {
+  .modal-recomendacao-overlay {
+    align-items: stretch;
+    justify-items: stretch;
+    padding: 0;
+    overflow: auto;
+    background: #fff;
+  }
+
   .modal-recomendacao {
-    width: calc(100vw - 16px);
-    height: calc(100vh - 16px);
+    width: 100%;
+    min-height: 100dvh;
+    height: auto;
+    max-height: none;
+    border-width: 0;
     overflow-y: auto;
   }
 
@@ -4188,25 +4425,170 @@ input::-webkit-inner-spin-button {
 }
 
 @media (max-width: 700px) {
+  .modal-recomendacao-overlay {
+    align-items: stretch;
+    justify-items: stretch;
+    padding: 0;
+    overflow: hidden;
+    background: #fff;
+  }
+
   .modal-recomendacao {
-    width: calc(100vw - 16px);
-    height: calc(100vh - 16px);
-    overflow-y: auto;
+    width: 100%;
+    height: 100dvh;
+    min-height: 100dvh;
+    border: 0;
+    overflow: hidden;
   }
 
   .resultado-modal {
     display: block;
-    height: auto;
-    min-height: 100%;
+    width: 100%;
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
   }
 
   .resultado-foto {
-    width: 100%;
-    height: 220px;
+    display: none;
   }
 
   .resultado-painel {
     width: 100%;
-    height: 440px;
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
   }
+
+  .modal-recomendacao > .btn-fechar-modal {
+    top: 17px;
+    right: 17px;
+    z-index: 12;
+    display: block;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #555;
+    font-size: 28px;
+    line-height: 28px;
+  }
+
+  .resultado-titulo {
+    top: 275px;
+    right: 13px;
+    left: auto;
+    font-size: 12px;
+  }
+
+  .resultado-tamanho-recomendado {
+    top: 300px;
+    right: 13px;
+    left: auto;
+    z-index: 5;
+  }
+
+  .resultado-card-tamanho {
+    width: 100px;
+    height: 91px;
+    font-size: 39px;
+  }
+
+  .resultado-editar {
+    position: absolute;
+    top: calc(100dvh - 315px);
+    left: calc(-245px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44vw;
+    max-width: 164px;
+    height: 42px;
+    margin: 0;
+    border: 0;
+    background: #e5e5e5;
+    color: #555;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .resultado-manequim {
+    top: 44px;
+    left: 5%;
+    width: 70%;
+    height: 455px;
+  }
+
+  .resultado-manequim img {
+    scale: 1.55;
+  }
+
+  .resultado-indicadores {
+    top: 0;
+    right: 12px;
+    width: 126px;
+    height: 455px;
+    z-index: 6;
+  }
+
+  .resultado-indicador {
+    gap: 7px;
+    font-size: 12px;
+  }
+
+  .resultado-indicador:nth-child(1) {
+    top: 30% !important;
+  }
+
+  .resultado-indicador:nth-child(2) {
+    top: 45% !important;
+  }
+
+  .resultado-indicador:nth-child(3) {
+    top: 53% !important;
+  }
+
+  .resultado-icone-medida {
+    width: 23px;
+    height: 23px;
+    font-size: 13px;
+  }
+
+  .resultado-outros-tamanhos {
+    left: 9%;
+    right: 9%;
+    bottom: 73px;
+    width: 82%;
+  }
+
+  .resultado-titulo-outros {
+    width: 100%;
+    height: 27px;
+  }
+
+  .resultado-opcoes {
+    gap: 0;
+    margin-top: 3px;
+  }
+
+  .resultado-opcao {
+    flex: 1 1 0;
+    width: auto;
+    height: 42px;
+  }
+
+  .resultado-seta {
+    width: 21px;
+    height: 42px;
+    font-size: 24px;
+  }
+
+  .resultado-fechar {
+    right: 4%;
+    bottom: 12px;
+    width: 44%;
+    height: 42px;
+  }
+
 }

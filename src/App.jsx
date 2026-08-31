@@ -24,13 +24,37 @@ export default function App() {
   const [formatoCorpo, setFormatoCorpo] = useState('030303')
   const [transicaoModal, setTransicaoModal] = useState(false)
   const [transicaoRecomendacao, setTransicaoRecomendacao] = useState(false)
-  
+  const [viewport, setViewport] = useState(() => ({
+    width: typeof window !== 'undefined' ? window.innerWidth : 0,
+    height: typeof window !== 'undefined' ? window.innerHeight : 0,
+    isPortrait: typeof window !== 'undefined' ? window.innerHeight > window.innerWidth : false,
+  }))
+
   useEffect(() => {
     function onHash() {
       setRoute(location.hash || '')
     }
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+
+  useEffect(() => {
+    function handleViewportChange() {
+      setViewport({
+        width: window.innerWidth,
+        height: window.innerHeight,
+        isPortrait: window.innerHeight > window.innerWidth,
+      })
+    }
+
+    handleViewportChange()
+    window.addEventListener('resize', handleViewportChange)
+    window.addEventListener('orientationchange', handleViewportChange)
+
+    return () => {
+      window.removeEventListener('resize', handleViewportChange)
+      window.removeEventListener('orientationchange', handleViewportChange)
+    }
   }, [])
 
   const handleShowRecommendation = (formato, medidasDoMannequin) => {
