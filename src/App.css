@@ -4069,7 +4069,7 @@ input::-webkit-inner-spin-button {
   color: #555;
   font-size: 12px;
   transform: translateY(-50%);
-  animation: path-reveal 1.10s ease;
+  animation: path-reveal 2.10s ease;
   transition: opacity .28s ease, transform .28s ease;
 }
 
