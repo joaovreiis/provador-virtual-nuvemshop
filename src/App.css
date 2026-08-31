@@ -3093,6 +3093,7 @@ input::-webkit-inner-spin-button {
   height: 34px;
   border-radius: 50%;
   background: #eee;
+  display: none;
 }
 
 .usuario-cabeca,
@@ -3870,6 +3871,7 @@ input::-webkit-inner-spin-button {
   height: 34px;
   border-radius: 50%;
   background: #eee;
+  display: none;
 }
 
 .usuario-cabeca,
