@@ -65,12 +65,11 @@ export default function Mannequin({ onBack, onShowRecommendation, usarMedidasMan
   };
 
   return (
-    <div className="modal-overlay">
-      <main className="screen-container">
-        {/* Badge da Loja */}
-        <header className="logo-badge">
-          <div className="brand-name">CROP.</div>
-        </header>
+    <main className="screen-container">
+      {/* Badge da Loja */}
+      <header className="logo-badge">
+        <div className="brand-name">CROP.</div>
+      </header>
 
         {/* Coluna Visual: Manequim e Paleta de Cores */}
         <section className="visual-column">
@@ -161,8 +160,7 @@ export default function Mannequin({ onBack, onShowRecommendation, usarMedidasMan
             </div>
           </div>
         </section>
-      </main>
-    </div>
+    </main>
   );
 }
 
@@ -178,7 +176,7 @@ function AdjustmentSlider({ label, value, onChange, onDecrement, onIncrement, mi
 
         <div className="slider-container">
           <div className="ruler-track">
-            <span className="ruler-tick" />
+            <span className="ruler-tick" /> 
             <span className="ruler-tick" />
             <span className="ruler-tick" />
             <span className="ruler-tick" />

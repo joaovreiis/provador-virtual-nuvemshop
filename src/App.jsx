@@ -22,6 +22,8 @@ export default function App() {
   const [naoSabeMedidas, setNaoSabeMedidas] = useState(false)
   const [roupaSelecionada, setRoupaSelecionada] = useState()
   const [formatoCorpo, setFormatoCorpo] = useState('030303')
+  const [transicaoModal, setTransicaoModal] = useState(false)
+  const [transicaoRecomendacao, setTransicaoRecomendacao] = useState(false)
   
   useEffect(() => {
     function onHash() {
@@ -38,10 +40,16 @@ export default function App() {
       setCintura(medidasDoMannequin.cintura)
       setQuadril(medidasDoMannequin.quadril)
     }
-    setMostrarRecomendacao(true)
+
+    setTransicaoRecomendacao(true)
+    window.setTimeout(() => {
+      setTransicaoRecomendacao(false)
+      setMostrarRecomendacao(true)
+    }, 1000)
   }
 
   const handleCloseRecommendation = () => {
+    setTransicaoRecomendacao(false)
     setMostrarRecomendacao(false)
   }
 
@@ -49,6 +57,23 @@ export default function App() {
     setRoupaSelecionada(roupa)
     setNaoSabeMedidas(false)
     setMedidasModalAberto(true)
+  }
+
+  const iniciarTransicaoModal = (proximoStep) => {
+    setTransicaoModal(true)
+    window.setTimeout(() => {
+      setTransicaoModal(false)
+      setMedidasModalAberto(false)
+      setStep(proximoStep)
+    }, 1000)
+  }
+
+  const mostrarModalDeMedidas = medidasModalAberto || step === 2
+
+  const handleCloseMedidasModal = () => {
+    setTransicaoModal(false)
+    setMedidasModalAberto(false)
+    setStep(0)
   }
 
   return (
@@ -65,20 +90,57 @@ export default function App() {
           <AdminPage />
         ) : (
           <>
-            {step === 0 && <SelecionarRoupa roupaSelecionada={roupaSelecionada} setRoupaSelecionada={setRoupaSelecionada} onNext={handleSelecionarRoupa} />}
-            {step === 1 && <CalculoAlturaPeso onNext={() => { setMedidasModalAberto(false); setStep(2) }} altura={altura} setAltura={setAltura} peso={peso} setPeso={setPeso} idade={idade} setIdade={setIdade} roupaSelecionada={roupaSelecionada} />}
-            {step === 2 && <MedidasCliente onNext={() => setStep(3)} busto={busto} setBusto={setBusto} cintura={cintura} setCintura={setCintura} quadril={quadril} setQuadril={setQuadril} naoSabeMedidas={naoSabeMedidas} setNaoSabeMedidas={setNaoSabeMedidas} roupaSelecionada={roupaSelecionada} />}
-            {step === 3 && <Mannequin onBack={() => setStep(0)} onShowRecommendation={handleShowRecommendation} usarMedidasMannequin={naoSabeMedidas} altura={altura} peso={peso} busto={busto} cintura={cintura} quadril={quadril} roupaSelecionada={roupaSelecionada} />}
+            {step === 1 && <CalculoAlturaPeso onNext={() => iniciarTransicaoModal(2)} altura={altura} setAltura={setAltura} peso={peso} setPeso={setPeso} idade={idade} setIdade={setIdade} roupaSelecionada={roupaSelecionada} />}
           </>
         )}
       </section>
 
-      {step === 0 && medidasModalAberto && (
-        <div className='medidas-modal-overlay' onClick={() => setMedidasModalAberto(false)}>
+      {step === 3 && !mostrarRecomendacao && (
+        <div className='medidas-modal-overlay' onClick={() => setStep(0)}>
+          <div className='medidas-modal' role='dialog' aria-modal='true' aria-labelledby='mannequin-modal-title' onClick={(event) => event.stopPropagation()}>
+            <button className='medidas-modal-close' type='button' aria-label='Fechar ajuste do manequim' onClick={() => setStep(0)}>x</button>
+            <h2 id='mannequin-modal-title' className='sr-only'>Ajuste do manequim</h2>
+            <div className='medidas-modal-content'>
+              {transicaoRecomendacao ? (
+                <div className='medidas-transition-screen'>
+                  <div className='medidas-transition-spinner' aria-label='Carregando recomendação' />
+                  <span>Preparando sua recomendação...</span>
+                </div>
+              ) : (
+                <Mannequin onBack={() => setStep(0)} onShowRecommendation={handleShowRecommendation} usarMedidasMannequin={naoSabeMedidas} altura={altura} peso={peso} busto={busto} cintura={cintura} quadril={quadril} roupaSelecionada={roupaSelecionada} />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {step === 0 && !medidasModalAberto && (
+        <div className='medidas-modal-overlay selecionar-roupa-modal-overlay' onClick={() => setStep(0)}>
+          <div className='medidas-modal selecionar-roupa-modal' role='dialog' aria-modal='true' aria-labelledby='selecionar-roupa-title' onClick={(event) => event.stopPropagation()}>
+            <button className='medidas-modal-close' type='button' aria-label='Fechar seleção de roupa' onClick={() => setStep(-1)}>x</button>
+            <h2 id='selecionar-roupa-title' className='sr-only'>Selecione a roupa</h2>
+            <SelecionarRoupa roupaSelecionada={roupaSelecionada} setRoupaSelecionada={setRoupaSelecionada} onNext={handleSelecionarRoupa} />
+          </div>
+        </div>
+      )}
+
+      {mostrarModalDeMedidas && (
+        <div className='medidas-modal-overlay' onClick={handleCloseMedidasModal}>
           <div className='medidas-modal' role='dialog' aria-modal='true' aria-labelledby='medidas-modal-title' onClick={(event) => event.stopPropagation()}>
-            <button className='medidas-modal-close' type='button' aria-label='Fechar formulário de medidas' onClick={() => setMedidasModalAberto(false)}>x</button>
+            <button className='medidas-modal-close' type='button' aria-label='Fechar formulário de medidas' onClick={handleCloseMedidasModal}>x</button>
             <h2 id='medidas-modal-title' className='sr-only'>Informe suas medidas</h2>
-            <CalculoAlturaPeso onNext={() => { setMedidasModalAberto(false); setStep(2) }} altura={altura} setAltura={setAltura} peso={peso} setPeso={setPeso} idade={idade} setIdade={setIdade} roupaSelecionada={roupaSelecionada} />
+            <div className='medidas-modal-content'>
+              {transicaoModal ? (
+                <div className='medidas-transition-screen'>
+                  <div className='medidas-transition-spinner' aria-label='Carregando próxima etapa' />
+                  <span>Preparando sua próxima etapa...</span>
+                </div>
+              ) : medidasModalAberto ? (
+                <CalculoAlturaPeso onNext={() => iniciarTransicaoModal(2)} altura={altura} setAltura={setAltura} peso={peso} setPeso={setPeso} idade={idade} setIdade={setIdade} roupaSelecionada={roupaSelecionada} />
+              ) : (
+                <MedidasCliente onNext={() => iniciarTransicaoModal(3)} busto={busto} setBusto={setBusto} cintura={cintura} setCintura={setCintura} quadril={quadril} setQuadril={setQuadril} naoSabeMedidas={naoSabeMedidas} setNaoSabeMedidas={setNaoSabeMedidas} roupaSelecionada={roupaSelecionada} />
+              )}
+            </div>
           </div>
         </div>
       )}
