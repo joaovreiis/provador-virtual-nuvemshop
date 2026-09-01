@@ -77,6 +77,22 @@ export default function App() {
     setMostrarRecomendacao(false)
   }
 
+  const handleRestartFlow = () => {
+    setTransicaoRecomendacao(false)
+    setMostrarRecomendacao(false)
+    setMedidasModalAberto(false)
+    setStep(0)
+    setRoupaSelecionada(undefined)
+    setAltura('')
+    setPeso('')
+    setIdade('')
+    setBusto(undefined)
+    setCintura(undefined)
+    setQuadril(undefined)
+    setNaoSabeMedidas(false)
+    setFormatoCorpo('030303')
+  }
+
   const handleSelecionarRoupa = (roupa) => {
     setRoupaSelecionada(roupa)
     setNaoSabeMedidas(false)
@@ -173,6 +189,7 @@ export default function App() {
         <RecomendarTamanho 
           tamanhoRecomendado={tamanhoRecomendado}
           onClose={handleCloseRecommendation}
+          onRestart={handleRestartFlow}
           onBack={() => {
             setMostrarRecomendacao(false)
             setStep(3)

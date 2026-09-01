@@ -74,7 +74,6 @@ export default function Mannequin({ onBack, onShowRecommendation, usarMedidasMan
         {/* Coluna Visual: Manequim e Paleta de Cores */}
         <section
           className="visual-column"
-          style={!imageError ? { backgroundImage: `url(${imageSrc})` } : undefined}
         >
           <div className="mannequin-container">
             {!imageError ? (

@@ -19,6 +19,14 @@ function getMedidasCategoria(categoria) {
 export default function MedidasCliente({ onNext, busto, setBusto, cintura, setCintura, quadril, setQuadril, naoSabeMedidas, setNaoSabeMedidas, roupaSelecionada }) {
   const medidasRelevantes = roupaSelecionada?.categoriaMedidas || getMedidasCategoria(roupaSelecionada?.categoria)
   const nomeRoupa = roupaSelecionada?.nome || roupaSelecionada?.name || 'Produto em destaque'
+  const valoresMedidas = { busto, cintura, quadril }
+  const medidasPreenchidas = medidasRelevantes
+    .filter((campo) => campo !== 'comprimento')
+    .every((campo) => {
+      const valor = valoresMedidas[campo]
+      return valor !== '' && valor !== null && valor !== undefined && Number.isFinite(Number(valor))
+    })
+  const isButtonEnabled = naoSabeMedidas || medidasPreenchidas
 
   return (
     <div className='card card-step medidas-step medidas-step-medidas'>
@@ -40,8 +48,7 @@ export default function MedidasCliente({ onNext, busto, setBusto, cintura, setCi
           </label>
         </div>
 
-        {!naoSabeMedidas && (
-          <div className='medidas-step-fields'>
+        <div className={`medidas-step-fields ${naoSabeMedidas ? 'medidas-step-fields-hidden' : ''}`} aria-hidden={naoSabeMedidas}>
             {medidasRelevantes.includes('busto') && (
               <div className='medidas-step-field'>
                 <label htmlFor='busto'>Busto</label>
@@ -71,15 +78,14 @@ export default function MedidasCliente({ onNext, busto, setBusto, cintura, setCi
                 </div>
               </div>
             )}
-          </div>
-        )}
+        </div>
 
         <div className='medidas-step-bottom'>
           <div className='medidas-step-dots' aria-label='Passo 2 de 2'>
             <span />
             <span className='active' />
           </div>
-          <button className='medidas-step-next' type='button' onClick={onNext}>PRÓXIMO</button>
+          <button className='medidas-step-next' type='button' disabled={!isButtonEnabled} onClick={onNext}>PRÓXIMO</button>
         </div>
       </div>
     </div>

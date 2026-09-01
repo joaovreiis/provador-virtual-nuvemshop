@@ -53,6 +53,20 @@ function medidaNumero(valor) {
   return Number.isFinite(numero) ? numero : null;
 }
 
+function faixaMedida(valor) {
+  if (typeof valor === 'number' && Number.isFinite(valor)) {
+    return { min: valor, max: valor, centro: valor };
+  }
+
+  const texto = String(valor ?? '').trim().replace(',', '.');
+  const valores = texto.match(/\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+  if (valores.length === 0 || valores.some((numero) => !Number.isFinite(numero))) return null;
+
+  const min = Math.min(...valores);
+  const max = Math.max(...valores);
+  return { min, max, centro: (min + max) / 2 };
+}
+
 function getMedidasCategoria(categoria) {
   return CATEGORIAS_MEDIDAS[categoria?.toLowerCase()] || CATEGORIAS_MEDIDAS.blusa
 }
@@ -60,11 +74,16 @@ function getMedidasCategoria(categoria) {
 function normalizarTamanho(tamanho) {
   const medidas = tamanho.measurements ?? tamanho.medidas ?? {};
 
+  const busto = faixaMedida(tamanho.busto ?? medidas.busto ?? medidas.bust);
+  const cintura = faixaMedida(tamanho.cintura ?? medidas.cintura ?? medidas.waist);
+  const quadril = faixaMedida(tamanho.quadril ?? medidas.quadril ?? medidas.hips);
+
   return {
     label: tamanho.label ?? tamanho.size ?? tamanho.tamanho ?? '',
-    busto: medidaNumero(tamanho.busto ?? medidas.busto ?? medidas.bust),
-    cintura: medidaNumero(tamanho.cintura ?? medidas.cintura ?? medidas.waist),
-    quadril: medidaNumero(tamanho.quadril ?? medidas.quadril ?? medidas.hips)
+    busto: busto?.centro ?? null,
+    cintura: cintura?.centro ?? null,
+    quadril: quadril?.centro ?? null,
+    faixas: { busto, cintura, quadril }
   };
 }
 
@@ -73,15 +92,29 @@ function classificarAjuste(medidaCliente, medidaRoupa) {
 
   const folga = medidaRoupa - medidaCliente;
 
-  if (folga < -2 || folga > 6) return 'critico';
-  if (folga > 3) return 'atencao';
-  return 'perfeito';
+  if (folga < -6) return 'muito-apertado';
+  if (folga < -3) return 'apertado';
+  if (folga < 0) return 'levemente-justo';
+  if (folga < 1) return 'justo';
+  if (folga <= 2) return 'ideal';
+  if (folga <= 3) return 'levemente-folgado';
+  if (folga <= 6) return 'folgado';
+  return 'muito-folgado';
 }
 
 function textoAjuste(status, folga) {
-  if (status === 'critico') return folga < 0 ? 'Muito apertado' : 'Muito folgado';
-  if (status === 'atencao') return folga < 0 ? 'Justo' : 'Folgado';
-  if (status === 'perfeito') return 'Perfeito';
+  const textos = {
+    'muito-apertado': 'Muito apertado',
+    apertado: 'Apertado',
+    'levemente-justo': 'Levemente justo',
+    justo: 'Justo',
+    ideal: 'Ideal',
+    'levemente-folgado': 'Levemente folgado',
+    folgado: 'Folgado',
+    'muito-folgado': 'Muito folgado'
+  };
+
+  if (textos[status]) return textos[status];
   return 'Sem medida';
 }
 
@@ -99,22 +132,49 @@ function formatarMedidaTabela(valor) {
   return Number.isFinite(numero) ? `${numero} cm` : `${texto} cm`;
 }
 
-function pontuarTamanho(tamanho, medidasCliente, medidasRelevantes) {
-  const camposFiltrados = CAMPOS_MEDIDAS.filter(campo => medidasRelevantes.includes(campo.key))
-  
-  return camposFiltrados.reduce((score, campo) => {
-    const medidaCliente = medidasCliente[campo.key];
-    const medidaRoupa = tamanho[campo.key];
+function obterIntervalo(tamanhos, indice, campo) {
+  const faixaAtual = tamanhos[indice]?.faixas?.[campo];
+  if (!faixaAtual) return null;
 
-    if (medidaCliente == null || medidaRoupa == null) return score + 100;
+  const anterior = tamanhos[indice - 1]?.faixas?.[campo]?.centro;
+  const proximo = tamanhos[indice + 1]?.faixas?.[campo]?.centro;
+  const min = faixaAtual.min !== faixaAtual.max
+    ? faixaAtual.min
+    : anterior == null ? -Infinity : (anterior + faixaAtual.centro) / 2;
+  const max = faixaAtual.min !== faixaAtual.max
+    ? faixaAtual.max
+    : proximo == null ? Infinity : (faixaAtual.centro + proximo) / 2;
 
-    const folga = medidaRoupa - medidaCliente;
-    const alvoConforto = 2;
-    const penalidadeApertado = folga < -2 ? Math.abs(folga) * 12 : 0;
-    const penalidadeFolgado = folga > 5 ? (folga - 5) * 4 : 0;
+  return { min, max };
+}
 
-    return score + Math.abs(folga - alvoConforto) + penalidadeApertado + penalidadeFolgado;
-  }, 0);
+function medidaNaFaixa(valor, intervalo) {
+  return valor != null && intervalo && valor >= intervalo.min && valor < intervalo.max;
+}
+
+function distanciaDaFaixa(valor, intervalo) {
+  if (valor == null || !intervalo) return 100;
+  if (valor < intervalo.min) return intervalo.min - valor;
+  if (valor >= intervalo.max) return valor - intervalo.max;
+  return 0;
+}
+
+function tamanhoDentroDasFaixas(tamanho, indice, tamanhos, medidasCliente, medidasRelevantes) {
+  return CAMPOS_MEDIDAS
+    .filter((campo) => medidasRelevantes.includes(campo.key))
+    .every((campo) => medidaNaFaixa(
+      medidasCliente[campo.key],
+      obterIntervalo(tamanhos, indice, campo.key)
+    ));
+}
+
+function pontuarTamanho(tamanho, indice, tamanhos, medidasCliente, medidasRelevantes) {
+  return CAMPOS_MEDIDAS
+    .filter((campo) => medidasRelevantes.includes(campo.key))
+    .reduce((score, campo) => score + distanciaDaFaixa(
+      medidasCliente[campo.key],
+      obterIntervalo(tamanhos, indice, campo.key)
+    ), 0);
 }
 
 function mapearFormatoMedida(valor, campo) {
@@ -136,6 +196,7 @@ function mapearFormatoMedida(valor, campo) {
 export default function RecomendarTamanho({
   tamanhoRecomendado,
   onClose,
+  onRestart,
   onSizeChange,
   altura,
   peso,
@@ -170,7 +231,7 @@ export default function RecomendarTamanho({
     quadril: '/editarMedidas/hip.jpg'
   }[medidaAtiva] ?? '/editarMedidas/chest.jpg';
 
-  const rotuloMedidaAtiva = { busto: 'Chest', cintura: 'Waist', quadril: 'Hip' }[medidaAtiva] ?? 'Chest';
+  const rotuloMedidaAtiva = { busto: 'Busto', cintura: 'Cintura', quadril: 'Quadril' }[medidaAtiva] ?? 'Chest';
 
   const mannequinPrincipalSrc = `/mannequin_formatos/${formatoCorpo || '030303'}.jpg`;
   const mannequinSrc = imagemMedidaAtiva;
@@ -193,8 +254,16 @@ export default function RecomendarTamanho({
   const tamanhoIdeal = useMemo(() => {
     if (tamanhosRoupa.length === 0) return null;
 
-    return tamanhosRoupa.reduce((melhor, tamanho) => (
-      pontuarTamanho(tamanho, medidasCliente, medidasRelevantes) < pontuarTamanho(melhor, medidasCliente, medidasRelevantes) ? tamanho : melhor
+    const tamanhoNaFaixa = tamanhosRoupa.find((tamanho, indice) => (
+      tamanhoDentroDasFaixas(tamanho, indice, tamanhosRoupa, medidasCliente, medidasRelevantes)
+    ));
+    if (tamanhoNaFaixa) return tamanhoNaFaixa;
+
+    return tamanhosRoupa.reduce((melhor, tamanho, indice) => (
+      pontuarTamanho(tamanho, indice, tamanhosRoupa, medidasCliente, medidasRelevantes)
+        < pontuarTamanho(melhor, tamanhosRoupa.indexOf(melhor), tamanhosRoupa, medidasCliente, medidasRelevantes)
+        ? tamanho
+        : melhor
     ), tamanhosRoupa[0]);
   }, [tamanhosRoupa, medidasCliente, medidasRelevantes]);
 
@@ -274,15 +343,6 @@ export default function RecomendarTamanho({
       ...medidasAtuais,
       [campo]: valor
     }));
-  };
-
-  const resetarMedidasEditadas = () => {
-    setMedidasEditadas({
-      busto: busto ?? '',
-      cintura: cintura ?? '',
-      quadril: quadril ?? '',
-      comprimento: medidasEditadas.comprimento ?? ''
-    });
   };
 
   const salvarMedidas = () => {
@@ -442,7 +502,7 @@ export default function RecomendarTamanho({
               </button>
 
               <div className="editar-medidas-actions">
-                <button className="btn-editar btn-editar-secundario" type="button" onClick={resetarMedidasEditadas}>
+                <button className="btn-editar btn-editar-secundario" type="button" onClick={onRestart}>
                   Reiniciar
                 </button>
                 <button className="btn-salvar-medidas" type="button" onClick={salvarMedidas}>Ver recomendação</button>
@@ -524,7 +584,11 @@ export default function RecomendarTamanho({
                       onClick={() => handleSizeChange(tamanho.label)}
                     >
                       {tamanho.label.toUpperCase()}
-                      {tamanho.label === tamanhoSelecionado && <span className="resultado-mini-check">✓</span>}
+                      {tamanho.label === tamanhoIdeal?.label ? (
+                        <span className="resultado-mini-check">✓</span>
+                      ) : (
+                        <span className="resultado-mini-x">x</span>
+                      )}
                     </button>
                   ))}
                   <button
@@ -538,8 +602,10 @@ export default function RecomendarTamanho({
                   </button>
                 </div>
               </div>
-
-              <button className="resultado-fechar" onClick={onClose}>FECHAR</button>
+              <div className="resultado-acoes-rodape">
+                <button className="resultado-editar-rodape" onClick={abrirEdicaoMedidas} type="button">EDITAR MEDIDAS</button>
+                <button className="resultado-fechar" onClick={onClose}>FECHAR</button>
+              </div>
             </section>
           </div>
         )}

@@ -22,6 +22,34 @@ const MEDIDAS_DISPONIVEIS = [
 
 const initialForm = { categoria: 'Blusa', name: '', description: '', sizes: [], image: '' }
 
+function separarIntervalo(valor) {
+  const texto = String(valor ?? '').trim().replace(',', '.')
+  const partes = texto.split('-')
+
+  if (partes.length > 1) {
+    return {
+      minimo: partes[0].trim(),
+      maximo: partes[1].trim()
+    }
+  }
+
+  const valores = texto.match(/\d+(?:\.\d+)?/g) ?? []
+  return {
+    minimo: valores[0] || '',
+    maximo: ''
+  }
+}
+
+function atualizarIntervalo(valor, parte, novoValor) {
+  const intervalo = separarIntervalo(valor)
+  intervalo[parte] = novoValor
+
+  if (!intervalo.minimo && !intervalo.maximo) return ''
+  if (!intervalo.maximo) return `${intervalo.minimo}-`
+  if (!intervalo.minimo) return `-${intervalo.maximo}`
+  return `${intervalo.minimo}-${intervalo.maximo}`
+}
+
 export default function AdminPage() {
   const [loggedIn, setLoggedIn] = useState(() => Boolean(localStorage.getItem('adminToken')))
   const [username, setUsername] = useState('')
@@ -359,7 +387,7 @@ export default function AdminPage() {
 
   if (!loggedIn) {
     return (
-      <div className='card card-step'>
+      <div className='card card-step admin-page'>
         <div style={{ maxWidth: 520 }}>
           <p className='subtitle'>Area do Administrador</p>
           <h2>Login</h2>
@@ -386,7 +414,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className='card card-step'>
+    <div className='card card-step admin-page'>
       <div>
         <div className='admin-header'>
           <div>
@@ -467,27 +495,39 @@ export default function AdminPage() {
                         </div>
                         <div className='formMedidas-cadastro' style={{ marginTop: 8 }}>
                           {getMedidasCategoria().includes('busto') && (
-                            <div>
+                            <div className='admin-measurement-field'>
                               <label>Busto (cm)</label>
-                              <input value={size.measurements.bust || ''} onChange={e => updateSize(i, 'bust', e.target.value)} />
+                              <div className='admin-measurement-range'>
+                                <input type='number' min='0' step='0.1' placeholder='Mín.' aria-label='Busto mínimo' value={separarIntervalo(size.measurements.bust).minimo} onChange={e => updateSize(i, 'bust', atualizarIntervalo(size.measurements.bust, 'minimo', e.target.value))} />
+                                <input type='number' min='0' step='0.1' placeholder='Máx.' aria-label='Busto máximo' value={separarIntervalo(size.measurements.bust).maximo} onChange={e => updateSize(i, 'bust', atualizarIntervalo(size.measurements.bust, 'maximo', e.target.value))} />
+                              </div>
                             </div>
                           )}
                           {getMedidasCategoria().includes('cintura') && (
-                            <div>
+                            <div className='admin-measurement-field'>
                               <label>Cintura (cm)</label>
-                              <input value={size.measurements.waist || ''} onChange={e => updateSize(i, 'waist', e.target.value)} />
+                              <div className='admin-measurement-range'>
+                                <input type='number' min='0' step='0.1' placeholder='Mín.' aria-label='Cintura mínima' value={separarIntervalo(size.measurements.waist).minimo} onChange={e => updateSize(i, 'waist', atualizarIntervalo(size.measurements.waist, 'minimo', e.target.value))} />
+                                <input type='number' min='0' step='0.1' placeholder='Máx.' aria-label='Cintura máxima' value={separarIntervalo(size.measurements.waist).maximo} onChange={e => updateSize(i, 'waist', atualizarIntervalo(size.measurements.waist, 'maximo', e.target.value))} />
+                              </div>
                             </div>
                           )}
                           {getMedidasCategoria().includes('quadril') && (
-                            <div>
+                            <div className='admin-measurement-field'>
                               <label>Quadril (cm)</label>
-                              <input value={size.measurements.hips || ''} onChange={e => updateSize(i, 'hips', e.target.value)} />
+                              <div className='admin-measurement-range'>
+                                <input type='number' min='0' step='0.1' placeholder='Mín.' aria-label='Quadril mínimo' value={separarIntervalo(size.measurements.hips).minimo} onChange={e => updateSize(i, 'hips', atualizarIntervalo(size.measurements.hips, 'minimo', e.target.value))} />
+                                <input type='number' min='0' step='0.1' placeholder='Máx.' aria-label='Quadril máximo' value={separarIntervalo(size.measurements.hips).maximo} onChange={e => updateSize(i, 'hips', atualizarIntervalo(size.measurements.hips, 'maximo', e.target.value))} />
+                              </div>
                             </div>
                           )}
                           {getMedidasCategoria().includes('comprimento') && (
-                            <div>
+                            <div className='admin-measurement-field'>
                               <label>Comprimento (cm)</label>
-                              <input value={size.measurements.length || ''} onChange={e => updateSize(i, 'length', e.target.value)} />
+                              <div className='admin-measurement-range'>
+                                <input type='number' min='0' step='0.1' placeholder='Mín.' aria-label='Comprimento mínimo' value={separarIntervalo(size.measurements.length).minimo} onChange={e => updateSize(i, 'length', atualizarIntervalo(size.measurements.length, 'minimo', e.target.value))} />
+                                <input type='number' min='0' step='0.1' placeholder='Máx.' aria-label='Comprimento máximo' value={separarIntervalo(size.measurements.length).maximo} onChange={e => updateSize(i, 'length', atualizarIntervalo(size.measurements.length, 'maximo', e.target.value))} />
+                              </div>
                             </div>
                           )}
                         </div>
