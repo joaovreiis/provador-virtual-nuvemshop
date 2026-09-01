@@ -150,6 +150,7 @@ export default function Mannequin({ onBack, onShowRecommendation, usarMedidasMan
           <div className="footer-actions">
             <div className="pagination-dots">
               <span className="dot" />
+              <span className="dot" />
               <span className="dot active" />
             </div>
             <div className="buttons-group">

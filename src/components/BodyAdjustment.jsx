@@ -136,6 +136,7 @@ export default function BodyAdjustment({ onBack, onNext, onValuesChange }) {
           <div className="pagination-dots">
             <span className="dot" />
             <span className="dot active" />
+            <span className="dot active" />
           </div>
           <div className="buttons-group">
             <button className="btn btn-back" type="button" onClick={onBack}>

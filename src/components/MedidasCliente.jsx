@@ -82,8 +82,9 @@ export default function MedidasCliente({ onNext, busto, setBusto, cintura, setCi
 
         <div className='medidas-step-bottom'>
           <div className='medidas-step-dots' aria-label='Passo 2 de 2'>
-            <span />
-            <span className='active' />
+            <span className="dots" />
+            <span className='dots active' />
+            <span className="dots" />
           </div>
           <button className='medidas-step-next' type='button' disabled={!isButtonEnabled} onClick={onNext}>PRÓXIMO</button>
         </div>

@@ -49,8 +49,9 @@ export default function CalculoAlturaPeso({ onNext, altura, setAltura, peso, set
 
         <div className='medidas-step-bottom'>
           <div className='medidas-step-dots' aria-label='Passo 1 de 2'>
-            <span className='active' />
-            <span />
+            <span className='dots active' />
+            <span className="dots" />
+            <span className="dots" />
           </div>
           <button className='medidas-step-next' type='button' disabled={!isButtonEnabled} onClick={onNext}>PRÓXIMO</button>
         </div>
