@@ -215,6 +215,7 @@ export default function RecomendarTamanho({
   const [editandoMedidas, setEditandoMedidas] = useState(false);
   const [mostrarMedidas, setMostrarMedidas] = useState(false);
   const [mostrarTabelaMedidas, setMostrarTabelaMedidas] = useState(false);
+  const [mostrarFita, setMostrarFita] = useState(false);
   const [indiceCarrossel, setIndiceCarrossel] = useState(0);
   const [medidaAtiva, setMedidaAtiva] = useState('busto');
   const [animacaoChave, setAnimacaoChave] = useState(0);
@@ -432,6 +433,15 @@ export default function RecomendarTamanho({
                 <span>CROP.</span>
               </div>
 
+              <button
+                className="editar-medidas-fita-botao"
+                type="button"
+                onClick={() => setMostrarFita(true)}
+                aria-label="Abrir opções de fita métrica"
+              >
+                <img src="/IconeFita.svg" alt="" aria-hidden="true" />
+              </button>
+
               <div className={`editar-medidas-silhueta medida-${medidaAtiva}`} aria-label={`Medida ativa: ${rotuloMedidaAtiva}`}>
                 <img src={mannequinSrc} alt="Modelo de referência" className="editar-medidas-modelo" />
 
@@ -494,9 +504,22 @@ export default function RecomendarTamanho({
                       </div>
                     </div>
                   );
+
                 })}
 
               </div>
+
+              {mostrarFita && (
+                <div className="fita-modal-overlay" onClick={() => setMostrarFita(false)}>
+                  <div className="fita-modal" role="dialog" aria-modal="true" aria-labelledby="fita-modal-titulo" onClick={(evento) => evento.stopPropagation()}>
+                    <button className="fita-modal-fechar" type="button" onClick={() => setMostrarFita(false)} aria-label="Fechar fita métrica">‹</button>
+                    <img src="/IconeFita.svg" alt="" className="fita-modal-icone" aria-hidden="true" />
+                    <h2 id="fita-modal-titulo">Fita métrica</h2>
+                    <p>Imprima, recorte e monte esta fita métrica para conferir suas medidas.</p>
+                    <a className="fita-modal-acao" href="/FitaCrop.pdf" download="FitaCrop.pdf">FITA MÉTRICA</a>
+                  </div>
+                </div>
+              )}
 
               <button className="editar-medidas-link" type="button" onClick={() => { setEditandoMedidas(false); setMostrarMedidas(true); }}>
               </button>
