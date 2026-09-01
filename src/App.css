@@ -1179,6 +1179,15 @@ input::-webkit-inner-spin-button {
     overflow: visible;
   }
 
+  .medidas-transition-screen {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100dvh;
+    min-height: 100dvh;
+    border: 0;
+    padding: 64px 24px 24px;
+  }
+
   .medidas-modal .medidas-step {
     min-height: 100dvh;
     height: auto;
@@ -3401,16 +3410,22 @@ input::-webkit-inner-spin-button {
 .resultado-manequim {
   position: absolute;
   top: 110px;
-  left: 25%;
-  width: 48%;
-  height: 100%;
+  left: 50%;
+  width: min(48%, 320px);
+  height: calc(100% - 110px);
+  min-height: 260px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .resultado-manequim img {
   width: 100%;
-  scale: 1.6;
   height: 100%;
   object-fit: contain;
+  transform: scale(1.55);
+  transform-origin: center;
 }
 
 .resultado-faixa {
@@ -3441,20 +3456,25 @@ input::-webkit-inner-spin-button {
 
 .resultado-indicadores {
   position: absolute;
-  top: 32%;
-  right: 39px;
+  top: 0;
+  right: 20px;
+  width: 170px;
+  height: 100%;
   z-index: 4;
-  display: flex;
-  flex-direction: column;
-  gap: 68px;
+  pointer-events: none;
 }
 
 .resultado-indicador {
+  position: absolute;
+  right: 0;
+  width: 100%;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 9px;
   color: #555;
   font-size: 12px;
+  transform: translateY(-50%);
 }
 
 .resultado-indicador:hover {
@@ -4195,16 +4215,22 @@ input::-webkit-inner-spin-button {
 .resultado-manequim {
   position: absolute;
   top: 110px;
-  left: 25%;
-  width: 48%;
-  height: 100%;
+  left: 50%;
+  width: min(48%, 320px);
+  height: calc(100% - 110px);
+  min-height: 260px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .resultado-manequim img {
   width: 100%;
-  scale: 1.6;
   height: 100%;
   object-fit: contain;
+  transform: scale(1.55);
+  transform-origin: center;
 }
 
 .resultado-manequim-svg {
@@ -4294,17 +4320,20 @@ input::-webkit-inner-spin-button {
 .resultado-indicadores {
   position: absolute;
   top: 0;
-  right: 39px;
-  width: 140px;
+  right: 20px;
+  width: 170px;
   height: 100%;
   z-index: 4;
+  pointer-events: none;
 }
 
 .resultado-indicador {
   position: absolute;
   right: 0;
+  width: 100%;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 9px;
   color: #555;
   font-size: 12px;
@@ -4476,14 +4505,14 @@ input::-webkit-inner-spin-button {
   }
 
   .resultado-titulo {
-    top: 275px;
+    top: 340px;
     right: 13px;
     left: auto;
     font-size: 12px;
   }
 
   .resultado-tamanho-recomendado {
-    top: 300px;
+    top: 370px;
     right: 13px;
     left: auto;
     z-index: 5;
@@ -4515,38 +4544,28 @@ input::-webkit-inner-spin-button {
 
   .resultado-manequim {
     top: 44px;
-    left: 5%;
-    width: 70%;
-    height: 455px;
+    left: 50%;
+    width: min(68vw, 290px);
+    height: 420px;
+    min-height: 0;
+    transform: translateX(-50%);
   }
 
   .resultado-manequim img {
-    scale: 1.55;
+    transform: scale(1.4);
   }
 
   .resultado-indicadores {
     top: 0;
-    right: 12px;
+    right: 8px;
     width: 126px;
-    height: 455px;
+    height: 420px;
     z-index: 6;
   }
 
   .resultado-indicador {
     gap: 7px;
-    font-size: 12px;
-  }
-
-  .resultado-indicador:nth-child(1) {
-    top: 30% !important;
-  }
-
-  .resultado-indicador:nth-child(2) {
-    top: 45% !important;
-  }
-
-  .resultado-indicador:nth-child(3) {
-    top: 53% !important;
+    font-size: 11px;
   }
 
   .resultado-icone-medida {
