@@ -74,6 +74,8 @@ export default function AdminPage() {
   const [categoriaModalAberto, setCategoriaModalAberto] = useState(false)
   const [categoriaForm, setCategoriaForm] = useState({ nome: '', medidas: [] })
   const [pesquisaCategoria, setPesquisaCategoria] = useState('')
+  const [integracao, setIntegracao] = useState(null)
+  const [integracaoMensagem, setIntegracaoMensagem] = useState('')
 
   async function handleLogin(e) {
     e.preventDefault()
@@ -106,6 +108,44 @@ export default function AdminPage() {
     } catch (error) {
       console.error('Login admin error:', error)
       setAuthError(error.message || 'Erro ao autenticar')
+    }
+  }
+
+  async function carregarIntegracao() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/integracoes/nuvemshop/status`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+      })
+      if (response.ok) setIntegracao((await response.json()).integration)
+    } catch (error) {
+      console.error('Nuvemshop status error:', error)
+    }
+  }
+
+  async function conectarNuvemshop() {
+    setIntegracaoMensagem('')
+    const response = await fetch(`${API_BASE_URL}/admin/integracoes/nuvemshop/connect`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+    })
+    const data = await response.json().catch(() => ({}))
+    if (!response.ok) {
+      setIntegracaoMensagem(data.error || 'Não foi possível iniciar a conexão')
+      return
+    }
+    window.location.assign(data.url)
+  }
+
+  async function sincronizarNuvemshop() {
+    setIntegracaoMensagem('Sincronizando catálogo...')
+    const response = await fetch(`${API_BASE_URL}/admin/integracoes/nuvemshop/sync`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+    })
+    const data = await response.json().catch(() => ({}))
+    setIntegracaoMensagem(response.ok ? `${data.total} produtos sincronizados.` : (data.error || 'Falha na sincronização'))
+    if (response.ok) {
+      setAdminView('list')
+      window.location.reload()
     }
   }
 
@@ -355,6 +395,10 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
+    if (loggedIn) carregarIntegracao()
+  }, [loggedIn])
+
+  useEffect(() => {
     async function loadPieces() {
       try {
         const response = await fetch(`${API_BASE_URL}/roupas`)
@@ -442,7 +486,24 @@ export default function AdminPage() {
           <button type='button' className='btn-editar' onClick={() => setCategoriaModalAberto(true)}>
             Categorias
           </button>
+          <button type='button' className={`btn-editar ${adminView === 'nuvemshop' ? 'ativo' : ''}`} onClick={() => setAdminView('nuvemshop')}>
+            Nuvemshop
+          </button>
         </div>
+
+        {adminView === 'nuvemshop' && (
+          <section className='admin-screen'>
+            <h3>Catálogo Nuvemshop</h3>
+            <p className='description'>Importe produtos e variantes da sua loja. As medidas do provador continuam sendo configuradas neste painel.</p>
+            <p>{integracao ? `Loja conectada: ${integracao.nome_loja || integracao.loja_id}` : 'Nenhuma loja conectada.'}</p>
+            {integracao?.ultima_sincronizacao && <p className='description'>Última sincronização: {new Date(integracao.ultima_sincronizacao).toLocaleString('pt-BR')}</p>}
+            {integracaoMensagem && <p className='description'>{integracaoMensagem}</p>}
+            <div className='card-footer'>
+              <button className='btn-primary' type='button' onClick={conectarNuvemshop}>Conectar loja</button>
+              <button className='btn-editar' type='button' onClick={sincronizarNuvemshop} disabled={!integracao}>Sincronizar produtos</button>
+            </div>
+          </section>
+        )}
 
         {adminView === 'create' && (
           <div className='admin-form admin-screen'>

@@ -5,10 +5,15 @@
 No painel da Vercel, acesse **Settings > Environment Variables** e adicione:
 
 ```
-DATABASE_URL=postgresql://neondb_owner:npg_lojB5NGhCLn0@ep-late-shape-acls3p7u-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+DATABASE_URL=URL_DO_SEU_POSTGRES
 JWT_SECRET=troque-esta-chave
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=admin123
+NUVEMSHOP_APP_ID=seu_app_id
+NUVEMSHOP_APP_SECRET=seu_app_secret
+NUVEMSHOP_REDIRECT_URI=https://seu-projeto.vercel.app/api/integracoes/nuvemshop/callback
+NUVEMSHOP_WEBHOOK_URL=https://seu-projeto.vercel.app/api/integracoes/nuvemshop/webhook
+NUVEMSHOP_SUCCESS_REDIRECT=https://seu-projeto.vercel.app/#/admin?integracao=nuvemshop-conectada
 ```
 
 ## Checklist de Deploy
@@ -16,6 +21,8 @@ ADMIN_PASSWORD=admin123
 - [ ] DATABASE_URL está preenchida com a URL do Neon
 - [ ] JWT_SECRET está definida com um valor seguro
 - [ ] ADMIN_USERNAME e ADMIN_PASSWORD estão preenchidas
+- [ ] Variáveis `NUVEMSHOP_*` estão preenchidas
+- [ ] URLs de callback e webhook estão cadastradas na aplicação Nuvemshop
 - [ ] O repositório está sincronizado com `git push`
 - [ ] O branch principal (main) está atualizado
 

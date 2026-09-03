@@ -8,7 +8,6 @@ const port = process.env.PORT || 3001;
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '2mb' }));
-app.get('/api/health', (_req, res) => res.json({ ok: true }));
 app.use('/api', routes);
 
 app.listen(port, () => {

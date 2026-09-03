@@ -39,7 +39,45 @@ export async function initSchema() {
       descricao TEXT,
       imagem TEXT,
       tamanhos JSONB NOT NULL DEFAULT '[]'::jsonb,
+      origem TEXT NOT NULL DEFAULT 'manual',
+      loja_externa_id TEXT,
+      produto_externo_id TEXT,
+      url_produto TEXT,
+      sku TEXT,
+      preco JSONB,
+      ativo BOOLEAN NOT NULL DEFAULT true,
+      sincronizado_em TIMESTAMP,
+      atualizado_externo_em TIMESTAMP,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    ALTER TABLE roupas ADD COLUMN IF NOT EXISTS origem TEXT NOT NULL DEFAULT 'manual';
+    ALTER TABLE roupas ADD COLUMN IF NOT EXISTS loja_externa_id TEXT;
+    ALTER TABLE roupas ADD COLUMN IF NOT EXISTS produto_externo_id TEXT;
+    ALTER TABLE roupas ADD COLUMN IF NOT EXISTS url_produto TEXT;
+    ALTER TABLE roupas ADD COLUMN IF NOT EXISTS sku TEXT;
+    ALTER TABLE roupas ADD COLUMN IF NOT EXISTS preco JSONB;
+    ALTER TABLE roupas ADD COLUMN IF NOT EXISTS ativo BOOLEAN NOT NULL DEFAULT true;
+    ALTER TABLE roupas ADD COLUMN IF NOT EXISTS sincronizado_em TIMESTAMP;
+    ALTER TABLE roupas ADD COLUMN IF NOT EXISTS atualizado_externo_em TIMESTAMP;
+
+    CREATE UNIQUE INDEX IF NOT EXISTS roupas_nuvemshop_produto_idx
+      ON roupas (loja_externa_id, produto_externo_id)
+      WHERE loja_externa_id IS NOT NULL AND produto_externo_id IS NOT NULL;
+
+    CREATE TABLE IF NOT EXISTS integracoes_nuvemshop (
+      id SERIAL PRIMARY KEY,
+      loja_id TEXT UNIQUE NOT NULL,
+      access_token TEXT NOT NULL,
+      nome_loja TEXT,
+      ultima_sincronizacao TIMESTAMP,
+      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS estados_oauth_nuvemshop (
+      estado TEXT PRIMARY KEY,
+      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS categorias (
