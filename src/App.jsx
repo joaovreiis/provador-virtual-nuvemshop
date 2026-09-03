@@ -24,6 +24,7 @@ export default function App() {
   const [formatoCorpo, setFormatoCorpo] = useState('030303')
   const [transicaoModal, setTransicaoModal] = useState(false)
   const [transicaoRecomendacao, setTransicaoRecomendacao] = useState(false)
+  const [produtoErro, setProdutoErro] = useState('')
   const [viewport, setViewport] = useState(() => ({
     width: typeof window !== 'undefined' ? window.innerWidth : 0,
     height: typeof window !== 'undefined' ? window.innerHeight : 0,
@@ -37,6 +38,26 @@ export default function App() {
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const produtoId = params.get('produto')
+    if (!produtoId || route === '#/admin') return
+
+    const apiBase = (import.meta.env.VITE_API_URL || `${window.location.origin}/api`).replace(/\/$/, '')
+    const lojaId = params.get('loja')
+    const query = lojaId ? `?loja_id=${encodeURIComponent(lojaId)}` : ''
+
+    fetch(`${apiBase}/roupas/nuvemshop/${encodeURIComponent(produtoId)}${query}`)
+      .then(async response => {
+        const data = await response.json().catch(() => ({}))
+        if (!response.ok) throw new Error(data.error || 'Produto não disponível no provador')
+        setRoupaSelecionada(data)
+        setProdutoErro('')
+        setStep(1)
+      })
+      .catch(error => setProdutoErro(error.message))
+  }, [route])
 
   useEffect(() => {
     function handleViewportChange() {
@@ -130,6 +151,7 @@ export default function App() {
           <AdminPage />
         ) : (
           <>
+            {produtoErro && <div className='empty-state'><h3>{produtoErro}</h3></div>}
             {step === 1 && <CalculoAlturaPeso onNext={() => iniciarTransicaoModal(2)} altura={altura} setAltura={setAltura} peso={peso} setPeso={setPeso} idade={idade} setIdade={setIdade} roupaSelecionada={roupaSelecionada} />}
           </>
         )}

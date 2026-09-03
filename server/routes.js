@@ -234,6 +234,25 @@ router.get('/roupas', async (_req, res) => {
   }
 });
 
+router.get('/roupas/nuvemshop/:produtoExternoId', async (req, res) => {
+  try {
+    await initSchema();
+    const lojaId = req.query.loja_id || req.headers['x-store-id'];
+    if (!lojaId) return res.status(400).json({ error: 'ID da loja não informado' });
+    const result = await query(
+      `SELECT id, nome, categoria, descricao, imagem, tamanhos, url_produto, sku, preco, origem
+       FROM roupas
+       WHERE loja_externa_id = $1 AND produto_externo_id = $2 AND ativo = true
+       LIMIT 1`,
+      [String(lojaId), String(req.params.produtoExternoId)]
+    );
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Produto não encontrado no catálogo do provador' });
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.post('/roupas', requireAdmin, async (req, res) => {
   try {
     await initSchema();
