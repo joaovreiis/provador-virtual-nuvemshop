@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import Mannequin from './components/Mannequin.jsx'
-import CalculoAlturaPeso from './components/calculoAlturaPeso.jsx'
+import CalculoAlturaPeso from './components/CalculoAlturaPeso.jsx'
 import RecomendarTamanho from './components/RecomendarTamanho.jsx'
 import MedidasCliente from './components/MedidasCliente.jsx'
 import SelecionarRoupa from './components/SelecionarRoupa.jsx'
