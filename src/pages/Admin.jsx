@@ -96,7 +96,7 @@ export default function AdminPage() {
       const data = await response.json().catch(() => ({}))
 
       if (!response.ok) {
-        throw new Error(data?.error || 'Falha ao autenticar')
+        throw new Error(data?.error || `Falha ao autenticar (HTTP ${response.status})`)
       }
 
       if (!data?.token) {
