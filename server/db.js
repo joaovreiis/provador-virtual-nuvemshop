@@ -1,8 +1,7 @@
 import { Pool } from 'pg';
 
 if (!process.env.DATABASE_URL) {
-  console.error('ERROR: DATABASE_URL is not defined');
-  process.exit(1);
+  throw new Error('DATABASE_URL não definida no ambiente do servidor');
 }
 
 const isNeon = process.env.DATABASE_URL.includes('neon.tech');
